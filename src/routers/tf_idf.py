@@ -2,6 +2,7 @@ from fastapi import UploadFile, APIRouter, HTTPException, status
 from fastapi.responses import HTMLResponse
 
 from utils import compute_tfidf
+from schemas.tf_idf import OutputResults
 
 router = APIRouter(
     tags=['Анализ tf_idf'],
@@ -29,10 +30,10 @@ async def home():
     '/',
     summary='Загрузка файла',
 )
-async def upload_files(files: list[UploadFile]):
+async def upload_files(files: list[UploadFile]) -> OutputResults:
     for file in files:
         if file.content_type != 'text/plain':
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid file type")
 
     results = compute_tfidf(files)
-    return results
+    return OutputResults(results=results)
