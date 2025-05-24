@@ -71,5 +71,5 @@ class Word:
             tf = round(self._count_in_files[filename] / files_with_counter[filename], 5)
             result['tf'].append(f'{tf} для файла {filename}')
         idf = round(log10(len(files_with_counter)/len(self._count_in_files)), 5)
-        result['idf'] = idf
+        result['idf'] = str(idf)
         return result
