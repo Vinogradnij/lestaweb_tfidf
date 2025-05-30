@@ -1,8 +1,8 @@
 from fastapi import UploadFile, APIRouter, HTTPException, status
 from fastapi.responses import HTMLResponse
 
-from utils import compute_tfidf
-from schemas.tf_idf import OutputResults
+from tfidf.service import compute_tfidf
+from tfidf.schemas import OutputResults
 
 router = APIRouter(
     tags=['Анализ tf_idf'],
