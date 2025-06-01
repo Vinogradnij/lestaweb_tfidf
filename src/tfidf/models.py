@@ -1,5 +1,5 @@
-from sqlalchemy.orm import Mapped
-from datetime import timedelta
+from sqlalchemy import TIMESTAMP
+from sqlalchemy.orm import Mapped, mapped_column
 
 from database import Base
 
@@ -9,4 +9,4 @@ class Records(Base):
     min_time_processed: Mapped[float]
     avg_time_processed: Mapped[float]
     max_time_processed: Mapped[float]
-    latest_file_processed_timestamp: Mapped[timedelta]
+    latest_file_processed_timestamp = mapped_column(TIMESTAMP)
