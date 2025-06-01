@@ -12,11 +12,11 @@ class ApiPrefix(BaseModel):
 
 
 class DatabaseConfig(BaseModel):
-    DB_HOST: str
-    DB_PORT: int
-    DB_USER: str
-    DB_PASSWORD: str
-    DB_NAME: str
+    HOST: str
+    PORT: int
+    USER: str
+    PASSWORD: str
+    NAME: str
 
     echo: bool
     echo_pool: bool
