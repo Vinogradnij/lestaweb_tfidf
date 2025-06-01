@@ -1,8 +1,8 @@
 """create records table
 
-Revision ID: 94a1560cc903
+Revision ID: c187e79d84be
 Revises:
-Create Date: 2025-06-02 01:54:22.158227
+Create Date: 2025-06-02 02:10:31.375217
 
 """
 
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = "94a1560cc903"
+revision: str = "c187e79d84be"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -31,7 +31,7 @@ def upgrade() -> None:
         sa.Column("avg_time_processed", sa.Float(), nullable=False),
         sa.Column("max_time_processed", sa.Float(), nullable=False),
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
-        sa.PrimaryKeyConstraint("id"),
+        sa.PrimaryKeyConstraint("id", name=op.f("pk_records")),
     )
 
 
