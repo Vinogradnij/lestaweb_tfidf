@@ -34,11 +34,11 @@ class Settings(BaseSettings):
     def database_url(self) -> str:
         url: PostgresDsn = PostgresDsn(
             f'postgresql+asyncpg://'
-            f'{self.db.DB_USER}:'
-            f'{self.db.DB_PASSWORD}@'
-            f'{self.db.DB_HOST}:'
-            f'{self.db.DB_PORT}/'
-            f'{self.db.DB_NAME}'
+            f'{self.db.USER}:'
+            f'{self.db.PASSWORD}@'
+            f'{self.db.HOST}:'
+            f'{self.db.PORT}/'
+            f'{self.db.NAME}'
         )
         return str(url)
 
