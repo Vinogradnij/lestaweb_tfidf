@@ -1,4 +1,6 @@
 from typing import AsyncGenerator
+
+from sqlalchemy import MetaData
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession, AsyncAttrs, AsyncEngine
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, declared_attr
 
@@ -46,6 +48,10 @@ db_handler = DatabaseHandler(
 
 class Base(DeclarativeBase):
     __abstract__ = True
+
+    metadata = MetaData(
+        naming_convention=settings.db.naming_convention
+    )
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
 
