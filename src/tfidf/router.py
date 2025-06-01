@@ -1,7 +1,7 @@
 from fastapi import UploadFile, APIRouter, HTTPException, status
 from fastapi.responses import HTMLResponse
 
-from tfidf.service import compute_tfidf
+from tfidf.files_handler import compute_tfidf
 from tfidf.schemas import OutputResults
 
 router = APIRouter(
