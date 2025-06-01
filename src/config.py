@@ -42,7 +42,12 @@ class Settings(BaseSettings):
         )
         return str(url)
 
-    model_config = SettingsConfigDict(env_file='.env')
+    model_config = SettingsConfigDict(
+        env_file=('.env-template','.env'),
+        case_sensitive=False,
+        env_prefix='TFIDF__',
+        env_nested_delimiter='__',
+    )
 
 
 settings = Settings()
