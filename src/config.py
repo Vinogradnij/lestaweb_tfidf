@@ -1,5 +1,5 @@
-from pydantic_settings import BaseSettings
-from pydantic import BaseModel
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import BaseModel, PostgresDsn
 
 
 class RunConfig(BaseModel):
@@ -11,8 +11,38 @@ class ApiPrefix(BaseModel):
     prefix: str = ''
 
 
+class DatabaseConfig(BaseModel):
+    DB_HOST: str
+    DB_PORT: int
+    DB_USER: str
+    DB_PASSWORD: str
+    DB_NAME: str
+
+    echo: bool
+    echo_pool: bool
+    pool_size: int = 50
+    max_overflow: int = 10
+
+
 class Settings(BaseSettings):
     run: RunConfig = RunConfig()
     api: ApiPrefix = ApiPrefix()
+    db: DatabaseConfig
+
+
+    @property
+    def database_url(self) -> str:
+        url: PostgresDsn = PostgresDsn(
+            f'postgresql+asyncpg://'
+            f'{self.db.DB_USER}:'
+            f'{self.db.DB_PASSWORD}@'
+            f'{self.db.DB_HOST}:'
+            f'{self.db.DB_PORT}/'
+            f'{self.db.DB_NAME}'
+        )
+        return str(url)
+
+    model_config = SettingsConfigDict(env_file='.env')
+
 
 settings = Settings()
