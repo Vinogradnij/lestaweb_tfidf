@@ -1,5 +1,6 @@
 from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession, AsyncAttrs, AsyncEngine
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, declared_attr
 
 from config import settings
 
@@ -41,3 +42,13 @@ db_handler = DatabaseHandler(
     pool_size=settings.db.pool_size,
     max_overflow=settings.db.max_overflow,
 )
+
+
+class Base(DeclarativeBase):
+    __abstract__ = True
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+
+    @declared_attr.directive
+    def __tablename__(cls) -> str:
+        return cls.__name__.lower()
