@@ -1,6 +1,30 @@
 from typing import Union
-
 from pydantic import BaseModel
+from datetime import datetime
+
+
+class RecordsBase(BaseModel):
+    files_processed: int
+    min_time_processed: float
+    avg_time_processed: float
+    max_time_processed: float
+    latest_file_processed_timestamp: datetime
+
+
+class RecordsCreate(BaseModel):
+    pass
+
+
+class RecordsRead(RecordsBase):
+    id: int
+
+
+class RecordsUpdate(RecordsBase):
+    pass
+
+
+class RecordsOut(RecordsBase):
+    pass
 
 
 class OutputResults(BaseModel):
