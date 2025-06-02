@@ -11,22 +11,6 @@ class MetricsOut(BaseModel):
     latest_file_processed_timestamp: datetime
 
 
-class RecordsCreate(BaseModel):
-    pass
-
-
-class RecordsRead(RecordsBase):
-    id: int
-
-
-class RecordsUpdate(RecordsBase):
-    pass
-
-
-class RecordsOut(RecordsBase):
-    pass
-
-
 class OutputResults(BaseModel):
     results: list[dict[str, Union[str, list[str]]]]
 
