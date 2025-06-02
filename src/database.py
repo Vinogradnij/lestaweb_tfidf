@@ -24,7 +24,7 @@ class DatabaseHandler:
             max_overflow=max_overflow,
         )
         self.session_factory: async_sessionmaker[AsyncSession] = async_sessionmaker(
-            bing=self.engine,
+            bind=self.engine,
             autoflush=False,
             expire_on_commit=False,
         )
