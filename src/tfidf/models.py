@@ -9,4 +9,4 @@ class Records(Base):
     min_time_processed: Mapped[float]
     avg_time_processed: Mapped[float]
     max_time_processed: Mapped[float]
-    latest_file_processed_timestamp = mapped_column(TIMESTAMP)
+    latest_file_processed_timestamp = mapped_column(TIMESTAMP, nullable=False)
