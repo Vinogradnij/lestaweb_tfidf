@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import db_handler
 from tfidf.files_handler import compute_tfidf
-from tfidf.schemas import OutputResults, RecordsOut
+from tfidf.schemas import OutputResults, MetricsOut
 from tfidf.service import get_metrics_tfidf
 
 router = APIRouter(
@@ -49,7 +49,7 @@ async def upload_files(files: list[UploadFile]) -> OutputResults:
     '/metrics',
     summary='Метрики приложения',
     tags=['Служебная информация'],
-    response_model=RecordsOut
+    response_model=MetricsOut
 )
 async def get_metrics(
         session: Annotated[AsyncSession, Depends(db_handler.session_dep)],

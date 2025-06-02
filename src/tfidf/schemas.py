@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from datetime import datetime
 
 
-class RecordsBase(BaseModel):
+class MetricsOut(BaseModel):
     files_processed: int
     min_time_processed: float
     avg_time_processed: float
