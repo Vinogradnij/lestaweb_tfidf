@@ -56,3 +56,12 @@ async def get_metrics(
 ):
     metrics = await get_metrics_tfidf(session=session)
     return metrics
+
+
+@router.get(
+    '/status',
+    summary='Статус приложения',
+    tags=['Служебная информация'],
+)
+async def get_status():
+    return {'status': 'OK'}
