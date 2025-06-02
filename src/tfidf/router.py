@@ -65,3 +65,11 @@ async def get_metrics(
 )
 async def get_status():
     return {'status': 'OK'}
+
+@router.get(
+    '/version',
+    summary='Версия приложения',
+    tags=['Служебная информация'],
+)
+async def get_version():
+    return {'version': 'версия приложения'}
