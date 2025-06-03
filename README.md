@@ -50,6 +50,7 @@ lestaweb_tfidf
 │   ├── config.py
 │   ├── database.py
 │   └── main.py
+├── CHANGELOG.md
 ├── README.md
 └── requirements.txt
 ```
@@ -68,6 +69,7 @@ lestaweb_tfidf
 * config.py - конфигурационные настройки приложения
 * database.py - управление соединением с БД
 * main.py - точка входа в приложение
+* CHANGELOG.md - описание изменений приложения согласно версионированию
 * README.md - описание приложения, включая инструкции по настройке и запуску
 * requirements.txt - зависимости приложения
 ## Подготовка к запуску
