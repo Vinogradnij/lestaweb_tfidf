@@ -50,7 +50,7 @@ class Settings(BaseSettings):
         return str(url)
 
     model_config = SettingsConfigDict(
-        env_file=('.env-template', '.env'),
+        env_file=('src/.env-template', 'src/.env'),
         case_sensitive=False,
         env_prefix='TFIDF__',
         env_nested_delimiter='__',
