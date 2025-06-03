@@ -44,6 +44,7 @@ lestaweb_tfidf
 │   │   ├── router.py
 │   │   ├── schemas.py
 │   │   └── service.py
+│   ├── .gitignore
 │   ├── .env-template
 │   ├── alembic.ini
 │   ├── config.py
@@ -61,6 +62,7 @@ lestaweb_tfidf
   * router.py - обработка путей веб запросов API
   * schemas.py - Pydantic схемы данных API
   * service.py - бизнес логика обработки пользовательских запросов
+* .gitignore - файл для указания git о том, что не следует индексировать
 * .env-template - пример .env файла для конфигурации
 * alembic.ini - настройка alembic
 * config.py - конфигурационные настройки приложения
