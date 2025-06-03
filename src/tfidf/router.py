@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import UploadFile, APIRouter, HTTPException, status
+from fastapi import UploadFile, APIRouter, HTTPException, status, Request
 from fastapi.params import Depends
 from fastapi.responses import HTMLResponse
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -71,5 +71,6 @@ async def get_status():
     summary='Версия приложения',
     tags=['Служебная информация'],
 )
-async def get_version():
-    return {'version': 'версия приложения'}
+async def get_version(request: Request):
+    version = request.app.version
+    return {'version': version}
