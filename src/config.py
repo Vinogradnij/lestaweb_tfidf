@@ -3,8 +3,8 @@ from pydantic import BaseModel, PostgresDsn
 
 
 class RunConfig(BaseModel):
-    host: str = '0.0.0.0'
-    port: int = 8000
+    host: str
+    port: int
 
 
 class ApiPrefix(BaseModel):
@@ -50,7 +50,7 @@ class Settings(BaseSettings):
         return str(url)
 
     model_config = SettingsConfigDict(
-        env_file=('src/.env-template', 'src/.env'),
+        env_file=('.env-template', '.env'),
         case_sensitive=False,
         env_prefix='TFIDF__',
         env_nested_delimiter='__',
