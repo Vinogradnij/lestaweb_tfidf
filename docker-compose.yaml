@@ -1,6 +1,13 @@
 services:
   backend:
-    image: vinogradnij/tfidf_app:1.1.0
+    build:
+        dockerfile: ./Dockerfile
     container_name: backend_tfidf
+    env_file:
+      - path: .env-template
+        required: true
+      - path: .env
+        required: false
     ports:
       - "8000:8000"
+      - "${TFIDF__RUN__PORT}:${TFIDF__RUN__PORT}"
