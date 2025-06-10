@@ -4,7 +4,7 @@ from sqlalchemy import MetaData
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession, AsyncAttrs, AsyncEngine
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, declared_attr
 
-from src.config import settings
+from config import settings
 
 
 class DatabaseHandler:
