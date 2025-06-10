@@ -4,6 +4,7 @@ import uvicorn
 
 from database import db_handler
 from tfidf.router import router as api_router
+from users.router import router as users_router
 from config import settings
 
 @asynccontextmanager
@@ -18,6 +19,9 @@ app_main = FastAPI(
 app_main.include_router(
     api_router,
     prefix=settings.api.prefix
+)
+app_main.include_router(
+    users_router,
 )
 
 if __name__ == '__main__':
