@@ -9,5 +9,4 @@ services:
       - path: .env
         required: false
     ports:
-      - "8000:8000"
       - "${TFIDF__RUN__PORT}:${TFIDF__RUN__PORT}"
