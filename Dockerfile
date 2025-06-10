@@ -10,4 +10,6 @@ COPY --from=build /root/.local /root/.local
 WORKDIR /app
 RUN python -m nltk.downloader stopwords
 COPY /src ./src
+COPY /alembic ./alembic
+COPY alembic.ini ./alembic.ini
 CMD ["python", "src/main.py"]
