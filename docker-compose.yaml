@@ -10,3 +10,29 @@ services:
         required: false
     ports:
       - "${TFIDF__RUN__PORT}:${TFIDF__RUN__PORT}"
+  database:
+    image: postgres:17.5-alpine3.21
+    container_name: postgres_tfidf
+    env_file:
+      - path: .env-template
+        required: true
+      - path: .env
+        required: false
+    environment:
+      POSTGRES_DB: ${TFIDF__DB__NAME}
+      POSTGRES_USER: ${TFIDF__DB__USER}
+      POSTGRES_PASSWORD: ${TFIDF__DB__PASSWORD}
+      PGDATA: /var/lib/postgresql/data
+    ports:
+      - '${TFIDF__DB__PORT}:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [ 'CMD-SHELL', 'pg_isready' ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  pgdata:
+    driver: local
