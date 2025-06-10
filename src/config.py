@@ -33,7 +33,7 @@ class DatabaseConfig(BaseModel):
 
 
 class Settings(BaseSettings):
-    run: RunConfig = RunConfig()
+    run: RunConfig
     api: ApiPrefix = ApiPrefix()
     db: DatabaseConfig
 
