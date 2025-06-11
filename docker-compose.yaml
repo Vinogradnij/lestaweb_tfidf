@@ -10,6 +10,8 @@ services:
         required: false
     ports:
       - "${TFIDF__RUN__PORT}:${TFIDF__RUN__PORT}"
+    entrypoint: ["./src/prestart.sh"]
+    command: ["python", "src/main.py"]
   database:
     image: postgres:17.5-alpine3.21
     container_name: postgres_tfidf

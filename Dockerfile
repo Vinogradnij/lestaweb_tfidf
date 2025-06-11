@@ -10,4 +10,4 @@ COPY --from=build /root/.local /root/.local
 WORKDIR /app
 RUN python -m nltk.downloader stopwords
 COPY /src ./src
-CMD ["python", "src/main.py"]
+RUN chmod +x ./src/prestart.sh
