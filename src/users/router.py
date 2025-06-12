@@ -1,5 +1,7 @@
 from fastapi import APIRouter
 
+from users.dependencies import session_dep
+
 router = APIRouter(
     tags=['Пользователи'],
 )
@@ -9,7 +11,9 @@ router = APIRouter(
     '/login',
     summary='Авторизация',
 )
-async def login():
+async def login(
+        session: session_dep,
+):
     pass
 
 
@@ -17,7 +21,9 @@ async def login():
     '/register',
     summary='Регистрация',
 )
-async def register():
+async def register(
+        session: session_dep,
+):
     pass
 
 
@@ -25,7 +31,9 @@ async def register():
     '/logout',
     summary='Логаут',
 )
-async def logout():
+async def logout(
+        session: session_dep,
+):
     pass
 
 
@@ -33,7 +41,9 @@ async def logout():
     '/user/{user_id}',
     summary='Изменение пароля',
 )
-async def edit_pass():
+async def edit_pass(
+        session: session_dep,
+):
     pass
 
 
@@ -41,5 +51,7 @@ async def edit_pass():
     '/user/{user_id}',
     summary='Удаление пользователя',
 )
-async def delete_user():
+async def delete_user(
+        session: session_dep,
+):
     pass
