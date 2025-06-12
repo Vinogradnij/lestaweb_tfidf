@@ -9,6 +9,10 @@ class UserCreate(UserBase):
     password: str
 
 
+class UserLogin(UserBase):
+    password: str
+
+
 class UserRead(UserBase):
     id: int
 
