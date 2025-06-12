@@ -1,6 +1,8 @@
 from fastapi import APIRouter
 
 from users.dependencies import session_dep
+from users.schemas import UserCreate, UserLogout
+from users.crud import create_user
 
 router = APIRouter(
     tags=['Пользователи'],
@@ -20,11 +22,14 @@ async def login(
 @router.post(
     '/register',
     summary='Регистрация',
+    response_model=UserLogout,
 )
 async def register(
+        user_in: UserCreate,
         session: session_dep,
 ):
-    pass
+    user = await create_user(session=session, user_in=user_in)
+    return user
 
 
 @router.get(
