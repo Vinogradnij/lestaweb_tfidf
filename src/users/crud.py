@@ -1,4 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 
 from users.models import User
 from users.schemas import UserCreate
@@ -12,3 +13,7 @@ async def create_user(session: AsyncSession, user_in: UserCreate) -> User:
     await session.commit()
     await session.refresh(user)
     return user
+
+async def get_user_by_login(session: AsyncSession, user_in: UserCreate) -> User | None:
+    result = await session.execute(select(User).where(User.login == user_in.login))
+    return result.scalar_one_or_none()
