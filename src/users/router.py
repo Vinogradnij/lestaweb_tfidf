@@ -1,8 +1,8 @@
-from fastapi import APIRouter
+from fastapi import APIRouter,HTTPException, status
 
 from users.dependencies import session_dep
 from users.schemas import UserCreate, UserLogout
-from users.crud import create_user
+from users.crud import create_user, get_user_by_login
 
 router = APIRouter(
     tags=['Пользователи'],
@@ -28,6 +28,9 @@ async def register(
         user_in: UserCreate,
         session: session_dep,
 ):
+    user_in_db = await get_user_by_login(session=session, user_in=user_in)
+    if user_in_db:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User already exists')
     user = await create_user(session=session, user_in=user_in)
     return user
 
