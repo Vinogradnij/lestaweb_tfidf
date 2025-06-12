@@ -17,9 +17,8 @@ services:
         condition: service_healthy
     develop:
       watch:
-        - action: sync+restart
+        - action: rebuild
           path: ./src
-          target: /app
         - action: rebuild
           path: requirements.txt
 
