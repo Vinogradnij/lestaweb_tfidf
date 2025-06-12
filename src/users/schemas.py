@@ -21,5 +21,5 @@ class UserUpdate(UserBase):
     password: str
 
 
-class UserOut(UserBase):
+class UserLogout(UserBase):
     pass
