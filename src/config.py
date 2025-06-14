@@ -32,10 +32,16 @@ class DatabaseConfig(BaseModel):
     }
 
 
+class Security(BaseModel):
+    secret_key: str
+    algorithm: str
+
+
 class Settings(BaseSettings):
     run: RunConfig
     api: ApiPrefix = ApiPrefix()
     db: DatabaseConfig
+    security: Security
 
     @property
     def database_url(self) -> str:
@@ -48,6 +54,14 @@ class Settings(BaseSettings):
             f'{self.db.NAME}'
         )
         return str(url)
+
+    @property
+    def auth_data(self) -> dict:
+        data = {
+            'secret_key': self.security.secret_key,
+            'algorithm': self.security.algorithm,
+        }
+        return data
 
     model_config = SettingsConfigDict(
         env_file=('.env-template', '.env'),
