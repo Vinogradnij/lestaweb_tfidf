@@ -8,12 +8,12 @@ from users.utils import hash_password
 
 async def create_user(session: AsyncSession, user_in: UserCreate) -> User:
     hashed_pass = hash_password(user_in.password)
-    user = User(login=user_in.login, password=hashed_pass)
+    user = User(username=user_in.username, password=hashed_pass)
     session.add(user)
     await session.commit()
     await session.refresh(user)
     return user
 
 async def get_user_by_login(session: AsyncSession, user_in: UserCreate) -> User | None:
-    result = await session.execute(select(User).where(User.login == user_in.login))
+    result = await session.execute(select(User).where(User.username == user_in.username))
     return result.scalar_one_or_none()
