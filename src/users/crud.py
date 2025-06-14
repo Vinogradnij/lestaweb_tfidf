@@ -2,13 +2,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from users.models import User
-from users.schemas import UserPassword
+from users.schemas import UserPassword, UserInDb
 from users.utils import hash_password
 
 
-async def create_user(session: AsyncSession, user_in: UserPassword) -> User:
+async def create_user(session: AsyncSession, user_in: UserPassword) -> UserInDb:
     hashed_pass = hash_password(user_in.password)
-    user = User(username=user_in.username, password=hashed_pass)
+    user = UserInDb(username=user_in.username, hashed_password=hashed_pass)
     session.add(user)
     await session.commit()
     await session.refresh(user)
