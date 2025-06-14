@@ -1,6 +1,6 @@
 from fastapi import APIRouter,HTTPException, status
 
-from users.dependencies import session_dep
+from dependencies import session_dep
 from users.schemas import UserCreate, UserLogout
 from users.crud import create_user, get_user_by_login
 
