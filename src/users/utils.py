@@ -1,8 +1,11 @@
 from passlib.context import CryptContext
 from sqlalchemy.ext.asyncio import AsyncSession
+from jose import jwt
+from datetime import datetime, timezone, timedelta
 
 from users.crud import get_user_by_username
 from users.schemas import UserBase
+from config import settings
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated='auto')
 
@@ -26,3 +29,12 @@ async def auth_user(session: AsyncSession, username: str, password: str) -> User
     if not verify_password(password, user.password):
         return False
     return UserBase(username=user.username)
+
+
+def create_access_token(data: dict):
+    to_encode = data.copy()
+    expire = datetime.now(timezone.utc) + timedelta(days=7)
+    to_encode.update({'exp': expire})
+    auth_data = settings.auth_data
+    encode_jwt = jwt.encode(to_encode, auth_data['secret_key'], algorithm=auth_data['algorithm'])
+    return encode_jwt
