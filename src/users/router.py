@@ -2,7 +2,7 @@ from fastapi import APIRouter,HTTPException, status
 
 from dependencies import session_dep
 from users.schemas import UserCreate, UserLogout
-from users.crud import create_user, get_user_by_login
+from users.crud import create_user, get_user_by_username
 
 router = APIRouter(
     tags=['Пользователи'],
