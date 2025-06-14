@@ -5,21 +5,8 @@ class UserBase(BaseModel):
     username: str
 
 
-class UserCreate(UserBase):
+class UserInDb(UserBase):
+    hashed_password: str
+
+class UserPassword(UserBase):
     password: str
-
-
-class UserLogin(UserBase):
-    password: str
-
-
-class UserRead(UserBase):
-    id: int
-
-
-class UserUpdate(UserBase):
-    password: str
-
-
-class UserLogout(UserBase):
-    pass

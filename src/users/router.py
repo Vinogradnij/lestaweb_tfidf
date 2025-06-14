@@ -2,6 +2,7 @@ from fastapi import APIRouter,HTTPException, status
 
 from dependencies import session_dep
 from users.schemas import UserCreate, UserLogout
+from users.schemas import UserBase, UserPassword
 from users.crud import create_user
 from users.utils import check_user_in_db
 
@@ -23,10 +24,10 @@ async def login(
 @router.post(
     '/register',
     summary='Регистрация',
-    response_model=UserLogout,
+    response_model=UserBase,
 )
 async def register(
-        user_in: UserCreate,
+        user_in: UserPassword,
         session: session_dep,
 ):
     check_user = check_user_in_db(session=session, username=user_in.username)
