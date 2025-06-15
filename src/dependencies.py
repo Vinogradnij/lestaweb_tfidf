@@ -7,6 +7,13 @@ from database import db_handler
 
 session_dep = Annotated[AsyncSession, Depends(db_handler.session_dep)]
 
-form_data_dep = Annotated[OAuth2PasswordRequestForm, Depends()]
+def get_token(request: Request):
+    token = request.cookies.get('access_token')
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token not found",
+        )
+    return token
 
-auth_dep = Annotated[UserBase, Depends()]
+token_dep = Annotated[str, Depends(get_token)]
