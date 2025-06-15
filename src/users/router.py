@@ -42,7 +42,7 @@ async def register(
     if check_user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User already exists')
     user = await create_user(session=session, user_in=user_in)
-    return user
+    return {'message': f'Пользователь {user.username} успешно зарегистрирован'}
 
 
 @router.get(
