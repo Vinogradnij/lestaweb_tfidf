@@ -12,6 +12,9 @@ class Document(UserRelationMixin, Base):
     path: Mapped[str]
     title: Mapped[str]
 
+    statistics: Mapped[list['Statistic']] = relationship(back_populates='Document')
+    collection_document: Mapped[list['Collection_Document']] = relationship(back_populates='Document')
+
 class Collection(UserRelationMixin, Base):
     _user_back_populates = 'collections'
 
