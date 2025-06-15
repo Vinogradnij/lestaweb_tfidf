@@ -1,11 +1,16 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
 from database import db_handler
 from tfidf.router import router as api_router
 from users.router import router as users_router
 from config import settings
+
+origins = [
+    'http://0.0.0.0',
+]
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -15,6 +20,13 @@ async def lifespan(app: FastAPI):
 app_main = FastAPI(
     lifespan=lifespan,
     version='1.1.0'
+)
+app_main.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 app_main.include_router(
     api_router,
