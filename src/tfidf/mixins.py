@@ -21,3 +21,19 @@ class UserRelationMixin:
             'User',
             back_populates=cls._user_back_populates
         )
+
+class DocumentRelationMixin:
+    _document_back_populates: str | None = None
+
+    @declared_attr
+    def document_id(cls) -> Mapped[int]:
+        return mapped_column(
+            ForeignKey('document.id'),
+        )
+
+    @declared_attr
+    def document(cls) -> Mapped['User']:
+        return relationship(
+            'Document',
+            back_populates=cls._document_back_populates
+        )
