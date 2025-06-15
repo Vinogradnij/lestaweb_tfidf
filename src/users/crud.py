@@ -44,10 +44,10 @@ async def get_current_user(session: AsyncSession, token: token_dep):
         raise credentials_exception
     return user
 
-async def auth_user(session: AsyncSession, username: str, password: str) -> UserBase | bool:
+async def auth_user(session: AsyncSession, username: str, password: str) -> UserBase | None:
     user = await get_user_by_username(session=session, username=username)
     if not user:
-        return False
+        return None
     if not verify_password(password, user.password):
-        return False
+        return None
     return UserBase(username=user.username)
