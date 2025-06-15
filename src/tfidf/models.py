@@ -5,7 +5,6 @@ from database import Base
 from tfidf.mixins import UserRelationMixin, DocumentRelationMixin, CollectionRelationMixin
 
 
-
 class Document(UserRelationMixin, Base):
     _user_back_populates = 'documents'
 
@@ -15,11 +14,13 @@ class Document(UserRelationMixin, Base):
     statistics: Mapped[list['Statistic']] = relationship(back_populates='Document')
     collection_document: Mapped[list['Collection_Document']] = relationship(back_populates='Document')
 
+
 class Collection(UserRelationMixin, Base):
     _user_back_populates = 'collections'
-    
+
     statistics: Mapped[list['Statistic']] = relationship(back_populates='Collection')
     collection_document: Mapped[list['Collection_Document']] = relationship(back_populates='Collection')
+
 
 class Collection_Document(DocumentRelationMixin, CollectionRelationMixin, Base):
     _document_back_populates = 'collection_documents'
