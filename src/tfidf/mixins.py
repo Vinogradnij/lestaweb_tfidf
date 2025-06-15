@@ -40,3 +40,20 @@ class DocumentRelationMixin:
             'Document',
             back_populates=cls._document_back_populates
         )
+
+
+class CollectionRelationMixin:
+    _collection_back_populates: str | None = None
+
+    @declared_attr
+    def collection_id(cls) -> Mapped[int]:
+        return mapped_column(
+            ForeignKey('collection.id'),
+        )
+
+    @declared_attr
+    def collection(cls) -> Mapped['Collection']:
+        return relationship(
+            'Collection',
+            back_populates=cls._collection_back_populates
+        )
