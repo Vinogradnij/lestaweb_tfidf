@@ -16,6 +16,7 @@ class Collection(UserRelationMixin, Base):
     _user_back_populates = 'collections'
 
 
-class CollectionDocument(DocumentRelationMixin, CollectionRelationMixin, Base):
-    _document_back_populates = 'collection_document'
-    _collection_back_populates = 'collection_document'
+class Collection_Document(DocumentRelationMixin, CollectionRelationMixin, Base):
+    _document_back_populates = 'collection_documents'
+    _collection_back_populates = 'collection_documents'
+
