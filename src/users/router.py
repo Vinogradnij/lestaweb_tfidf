@@ -1,11 +1,9 @@
 from fastapi import APIRouter,HTTPException, status
 
-from dependencies import session_dep
-from users.schemas import UserCreate, UserLogout
-from users.schemas import UserBase, UserPassword
-from users.crud import create_user
-from users.utils import check_user_in_db
+from dependencies import session_dep, form_data_dep
+from users.schemas import UserBase, UserPassword, Token
 from users.crud import create_user, auth_user, get_user_by_username
+from users.utils import create_access_token
 
 router = APIRouter(
     tags=['Пользователи'],
@@ -15,11 +13,25 @@ router = APIRouter(
 @router.post(
     '/login',
     summary='Авторизация',
+    response_model=Token
 )
 async def login(
         session: session_dep,
+        form_data: form_data_dep,
 ):
-    pass
+    user = await auth_user(session=session, username=form_data.username, password=form_data.password)
+    if not user:
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Incorrect username or password",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+    access_token = create_access_token(
+        data={'sub': user.username}
+    )
+    return Token(access_token=access_token, token_type='bearer')
+
 
 
 @router.post(
