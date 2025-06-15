@@ -32,7 +32,6 @@ async def login(
 @router.post(
     '/register',
     summary='Регистрация',
-    response_model=UserBase,
 )
 async def register(
         user_in: UserPassword,
