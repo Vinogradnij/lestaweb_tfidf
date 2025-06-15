@@ -20,3 +20,11 @@ class Collection_Document(DocumentRelationMixin, CollectionRelationMixin, Base):
     _document_back_populates = 'collection_documents'
     _collection_back_populates = 'collection_documents'
 
+
+class Statistic(DocumentRelationMixin, CollectionRelationMixin, Base):
+    _document_back_populates = 'statistics'
+    _collection_back_populates = 'statistics'
+
+    word: Mapped[str]
+    tf: Mapped[float]
+    idf: Mapped[float]
