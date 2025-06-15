@@ -4,6 +4,7 @@ from fastapi import HTTPException, status
 from jose.exceptions import JWTError
 from jose import jwt
 
+from database import db_handler
 from users.models import User
 from users.schemas import UserPassword, UserInDb
 from users.utils import hash_password, verify_password
@@ -24,7 +25,7 @@ async def get_user_by_username(session: AsyncSession, username: str) -> User | N
     result = await session.execute(select(User).where(User.username == username))
     return result.scalar_one_or_none()
 
-async def get_current_user(session: AsyncSession, token: token_dep):
+async def get_current_user(token: token_dep):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -39,7 +40,8 @@ async def get_current_user(session: AsyncSession, token: token_dep):
         token_data = TokenData(username=username)
     except JWTError:
         raise credentials_exception
-    user = get_user_by_username(session=session, username=token_data.username)
+    async with db_handler.session_factory() as session:
+        user = await get_user_by_username(session=session, username=token_data.username)
     if user is None:
         raise credentials_exception
     return user
