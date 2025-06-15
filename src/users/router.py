@@ -4,7 +4,8 @@ from fastapi import APIRouter, HTTPException, status, Response, Depends
 
 from dependencies import session_dep
 from users.schemas import UserBase, UserPassword, PasswordBase
-from users.crud import create_user, auth_user, get_user_by_username, get_current_user, change_password
+from users.crud import create_user, auth_user, get_user_by_username, get_current_user, change_password, \
+    delete_user_by_id
 from users.utils import create_access_token
 
 router = APIRouter(
@@ -64,7 +65,7 @@ async def edit_pass(
         session: session_dep,
         current_user: Annotated[UserBase, Depends(get_current_user)],
         password_in: PasswordBase,
-        user_id: int
+        user_id: int,
 ):
     user = await change_password(
         session=session, password=password_in.password, user_id=user_id, current_user=current_user
@@ -78,5 +79,11 @@ async def edit_pass(
 )
 async def delete_user(
         session: session_dep,
+        current_user: Annotated[UserBase, Depends(get_current_user)],
+        user_id: int,
+        response: Response,
 ):
-    pass
+    await delete_user_by_id(session=session, user_id=user_id, current_user=current_user)
+    response.delete_cookie(key='access_token')
+    return {'message': f'Пользователь {current_user.username} успешно удален'}
+
