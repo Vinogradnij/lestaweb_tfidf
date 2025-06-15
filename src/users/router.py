@@ -3,6 +3,7 @@ from fastapi import APIRouter,HTTPException, status
 from dependencies import session_dep, form_data_dep
 from users.schemas import UserBase, UserPassword, Token
 from users.crud import create_user, auth_user, get_user_by_username
+from users.schemas import UserBase, UserPassword
 from users.utils import create_access_token
 
 router = APIRouter(
@@ -30,7 +31,7 @@ async def login(
     access_token = create_access_token(
         data={'sub': user.username}
     )
-    return Token(access_token=access_token, token_type='bearer')
+    return {'message': 'Вы успешно вошли в систему'}
 
 
 
