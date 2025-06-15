@@ -57,10 +57,13 @@ async def auth_user(session: AsyncSession, username: str, password: str) -> User
         return None
     return UserBase(username=user.username)
 
-async def change_password(session: AsyncSession, password: str, user_id: int, current_user: UserBase) -> UserInDb:
+async def verify_id(session: AsyncSession, user_id: int, current_user: UserBase) -> None:
     request_user = await get_user_by_username(session=session, username=current_user.username)
     if request_user.id != user_id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Not allowed changing')
+
+async def change_password(session: AsyncSession, password: str, user_id: int, current_user: UserBase) -> UserInDb:
+    await verify_id(session=session, user_id=user_id, current_user=current_user)
     user = await get_user_by_id(session=session, user_id=user_id)
     if not user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User not found')
