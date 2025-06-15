@@ -3,8 +3,8 @@ from typing import Annotated
 from fastapi import APIRouter, HTTPException, status, Response, Depends
 
 from dependencies import session_dep
-from users.schemas import UserBase, UserPassword
-from users.crud import create_user, auth_user, get_user_by_username, get_current_user
+from users.schemas import UserBase, UserPassword, PasswordBase
+from users.crud import create_user, auth_user, get_user_by_username, get_current_user, change_password
 from users.utils import create_access_token
 
 router = APIRouter(
