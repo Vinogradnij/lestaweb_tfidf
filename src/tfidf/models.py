@@ -17,7 +17,9 @@ class Document(UserRelationMixin, Base):
 
 class Collection(UserRelationMixin, Base):
     _user_back_populates = 'collections'
-
+    
+    statistics: Mapped[list['Statistic']] = relationship(back_populates='Collection')
+    collection_document: Mapped[list['Collection_Document']] = relationship(back_populates='Collection')
 
 class Collection_Document(DocumentRelationMixin, CollectionRelationMixin, Base):
     _document_back_populates = 'collection_documents'
