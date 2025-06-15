@@ -72,3 +72,9 @@ async def change_password(session: AsyncSession, password: str, user_id: int, cu
     await session.commit()
     await session.refresh(user)
     return UserInDb(username=user.username, hashed_password=hashed_pass)
+
+async def delete_user_by_id(session: AsyncSession, user_id: int, current_user: UserBase):
+    await verify_id(session=session, user_id=user_id, current_user=current_user)
+    user = await get_user_by_id(session=session, user_id=user_id)
+    await session.delete(user)
+    await session.commit()
