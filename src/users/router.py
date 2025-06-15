@@ -1,9 +1,10 @@
-from fastapi import APIRouter,HTTPException, status
+from typing import Annotated
 
-from dependencies import session_dep, form_data_dep
-from users.schemas import UserBase, UserPassword, Token
-from users.crud import create_user, auth_user, get_user_by_username
+from fastapi import APIRouter, HTTPException, status, Response, Depends
+
+from dependencies import session_dep
 from users.schemas import UserBase, UserPassword
+from users.crud import create_user, auth_user, get_user_by_username, get_current_user
 from users.utils import create_access_token
 
 router = APIRouter(
@@ -14,25 +15,18 @@ router = APIRouter(
 @router.post(
     '/login',
     summary='Авторизация',
-    response_model=Token
 )
 async def login(
         session: session_dep,
-        form_data: form_data_dep,
+        user_in: UserPassword,
+        response: Response
 ):
-    user = await auth_user(session=session, username=form_data.username, password=form_data.password)
-    if not user:
-        if not user:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Incorrect username or password",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
-    access_token = create_access_token(
-        data={'sub': user.username}
-    )
+    user = await auth_user(session=session, username=user_in.username, password=user_in.password)
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Incorrect username or password')
+    access_token = create_access_token(data={'sub': user.username})
+    response.set_cookie(key='access_token', value=access_token)
     return {'message': 'Вы успешно вошли в систему'}
-
 
 
 @router.post(
