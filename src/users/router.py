@@ -50,9 +50,11 @@ async def register(
     summary='Логаут',
 )
 async def logout(
-        session: session_dep,
+        current_user: Annotated[UserBase, Depends(get_current_user)],
+        response: Response,
 ):
-    pass
+    response.delete_cookie(key='access_token')
+    return {'message': f'Пользователь {current_user.username} успешно вышел из системы'}
 
 
 @router.patch(
