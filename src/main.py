@@ -6,6 +6,7 @@ import uvicorn
 from database import db_handler
 from tfidf.router import router as api_router
 from users.router import router as users_router
+from info.router import router as info_router
 from config import settings
 
 origins = [
@@ -34,6 +35,9 @@ app_main.include_router(
 )
 app_main.include_router(
     users_router,
+)
+app_main.include_router(
+    info_router,
 )
 
 if __name__ == '__main__':
