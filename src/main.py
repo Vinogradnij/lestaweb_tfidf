@@ -19,7 +19,7 @@ async def lifespan(app: FastAPI):
 
 app_main = FastAPI(
     lifespan=lifespan,
-    version='1.1.0'
+    version='1.2.0'
 )
 app_main.add_middleware(
     CORSMiddleware,
