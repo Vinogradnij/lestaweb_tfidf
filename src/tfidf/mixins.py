@@ -5,6 +5,8 @@ from sqlalchemy.orm import declared_attr, Mapped, mapped_column, relationship
 
 if TYPE_CHECKING:
     from users.models import User
+    from tfidf.models import Document, Collection
+
 
 class UserRelationMixin:
     _user_back_populates: str | None = None
@@ -22,6 +24,7 @@ class UserRelationMixin:
             back_populates=cls._user_back_populates
         )
 
+
 class DocumentRelationMixin:
     _document_back_populates: str | None = None
 
@@ -32,7 +35,7 @@ class DocumentRelationMixin:
         )
 
     @declared_attr
-    def document(cls) -> Mapped['User']:
+    def document(cls) -> Mapped['Document']:
         return relationship(
             'Document',
             back_populates=cls._document_back_populates
