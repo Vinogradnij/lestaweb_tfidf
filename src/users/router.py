@@ -5,6 +5,7 @@ from users.schemas import UserCreate, UserLogout
 from users.schemas import UserBase, UserPassword
 from users.crud import create_user
 from users.utils import check_user_in_db
+from users.crud import create_user, auth_user, get_user_by_username
 
 router = APIRouter(
     tags=['Пользователи'],
@@ -30,7 +31,7 @@ async def register(
         user_in: UserPassword,
         session: session_dep,
 ):
-    check_user = check_user_in_db(session=session, username=user_in.username)
+    check_user = await get_user_by_username(session=session, username=user_in.username)
     if check_user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User already exists')
     user = await create_user(session=session, user_in=user_in)
