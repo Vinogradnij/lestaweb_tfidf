@@ -62,8 +62,14 @@ async def logout(
 )
 async def edit_pass(
         session: session_dep,
+        current_user: Annotated[UserBase, Depends(get_current_user)],
+        password_in: PasswordBase,
+        user_id: int
 ):
-    pass
+    user = await change_password(
+        session=session, password=password_in.password, user_id=user_id, current_user=current_user
+    )
+    return {'message': f'Пароль пользователя {user.username} успешно изменён'}
 
 
 @router.delete(
