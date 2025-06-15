@@ -1,6 +1,7 @@
 from passlib.context import CryptContext
 from jose import jwt
 from datetime import datetime, timezone, timedelta
+from fastapi import Request, HTTPException, status
 
 from config import settings
 
@@ -22,3 +23,12 @@ def create_access_token(data: dict):
     auth_data = settings.auth_data
     encode_jwt = jwt.encode(to_encode, auth_data['secret_key'], algorithm=auth_data['algorithm'])
     return encode_jwt
+
+def get_token(request: Request):
+    token = request.cookies.get('access_token')
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token not found",
+        )
+    return token
