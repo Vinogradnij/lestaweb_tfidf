@@ -5,13 +5,12 @@ from info.schemas import MetricsOut
 from info.service import get_metrics_tfidf
 
 router = APIRouter(
-    tags=['Анализ tf_idf'],
+    tags=['Служебная информация'],
 )
 
 @router.get(
     '/metrics',
-    summary='Метрики приложения',
-    tags=['Служебная информация'],
+    summary='Метрики приложения [Не реализовано]',
     response_model=MetricsOut
 )
 async def get_metrics(
@@ -24,7 +23,6 @@ async def get_metrics(
 @router.get(
     '/status',
     summary='Статус приложения',
-    tags=['Служебная информация'],
 )
 async def get_status():
     return {'status': 'OK'}
@@ -32,7 +30,6 @@ async def get_status():
 @router.get(
     '/version',
     summary='Версия приложения',
-    tags=['Служебная информация'],
 )
 async def get_version(request: Request):
     version = request.app.version
