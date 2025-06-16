@@ -5,8 +5,8 @@ from fastapi.responses import HTMLResponse
 
 from dependencies import session_dep
 from tfidf.files_handler import compute_tfidf
-from tfidf.schemas import OutputResults
-from tfidf.crud import save_files
+from tfidf.schemas import OutputResults, DocumentOut
+from tfidf.crud import save_files, get_files
 from users.crud import get_current_user
 from users.schemas import UserBase, UserInDb
 
@@ -52,10 +52,15 @@ async def upload_files(
 
 @router.get(
     '/documents',
-    summary='Получить список документов пользователя'
+    summary='Получить список документов пользователя',
+    response_model=list[DocumentOut]
 )
-async def get_documents():
-    pass
+async def get_documents(
+        session: session_dep,
+        current_user: Annotated[UserInDb, Depends(get_current_user)],
+):
+    documents = await get_files(session=session, current_user=current_user)
+    return documents
 
 
 @router.get(
