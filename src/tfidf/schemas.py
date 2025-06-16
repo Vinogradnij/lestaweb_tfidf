@@ -7,6 +7,14 @@ class DocumentOut(BaseModel):
     title: str
 
 
+class DocumentOnlyIdOut(BaseModel):
+    id: int
+
+
+class CollectionOnlyIdOut(BaseModel):
+    documents: Sequence[DocumentOnlyIdOut]
+
+
 class CollectionOut(BaseModel):
     id: int
     documents: Sequence[DocumentOut]
@@ -14,6 +22,7 @@ class CollectionOut(BaseModel):
 
 class AllCollectionOut(BaseModel):
     collections: Sequence[CollectionOut]
+
 
 class OutputResults(BaseModel):
     results: list[dict[str, Union[str, list[str]]]]
@@ -52,4 +61,3 @@ class OutputResults(BaseModel):
             ]
         }
     }
-
