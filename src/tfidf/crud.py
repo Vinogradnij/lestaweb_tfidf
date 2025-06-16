@@ -9,7 +9,7 @@ from collections import deque
 from tfidf.schemas import DocumentOut
 from users.schemas import UserInDb
 from tfidf.models import Document, Collection, Collection_Document
-from definitions import ROOT_SRC
+from definitions import ROOT
 
 
 async def save_files(session: AsyncSession, current_user: UserInDb, files: list[UploadFile]):
@@ -23,8 +23,7 @@ async def save_files(session: AsyncSession, current_user: UserInDb, files: list[
         filename = file.filename
         date = datetime.now(UTC).strftime('%Y-%m-%d_%H:%M:%S')
         path = f'src/files/{username}/{date}/{filename}'
-        print(ROOT_SRC)
-        Path(f'{ROOT_SRC}/files/{username}/{date}').mkdir(parents=True, exist_ok=True  )
+        Path(f'{ROOT}/src/files/{username}/{date}').mkdir(parents=True, exist_ok=True  )
 
         async with aiofiles.open(path, 'wb') as local_file:
             while chunks := await file.read(1024):
