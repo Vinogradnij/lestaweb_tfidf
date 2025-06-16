@@ -1,9 +1,11 @@
 import aiofiles
 from fastapi import UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import Select
 from datetime import datetime, UTC
 from pathlib import Path
 
+from tfidf.schemas import DocumentOut
 from users.schemas import UserInDb
 from tfidf.models import Document, Collection, Collection_Document
 from definitions import ROOT_SRC
@@ -36,3 +38,9 @@ async def save_files(session: AsyncSession, current_user: UserInDb, files: list[
         session.add(user_collection_document)
 
     await session.commit()
+
+
+async def get_files(session: AsyncSession, current_user: UserInDb) -> list[DocumentOut] | list[None]:
+    ds = await session.execute(Select(Document).where(Document.user_id == current_user.id))
+    results = [DocumentOut(id=doc.id, title=doc.title) for doc in ds.scalars().all()]
+    return results
