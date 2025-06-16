@@ -84,6 +84,21 @@ async def delete_file(session: AsyncSession, current_user: UserInDb, document_id
     Path(ROOT / Path(document.path)).unlink()
 
 
+async def get_collection_by_id(
+        session: AsyncSession,
+        current_user: UserInDb,
+        collection_id: int
+) -> Collection:
+    stmt = select(Collection).where(and_(Collection.user_id == current_user.id, Collection.id == collection_id))
+    collection = await session.execute(stmt)
+    collection = collection.scalar_one_or_none()
+
+    if collection is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Collection not found')
+
+    return collection
+
+
 async def get_collections_with_files(session: AsyncSession, current_user: UserInDb) -> AllCollectionOut | None:
     stmt = (
         select(Collection)
@@ -139,13 +154,16 @@ async def add_document_to_collection(
         document_id: int,
         collection_id: int
 ) -> None:
-    document = await get_file_by_id(session=session, current_user=current_user, document_id=document_id)
-    stmt = select(Collection).where(and_(Collection.user_id == current_user.id, Collection.id == collection_id))
-    collection = await session.execute(stmt)
-    collection = collection.scalar_one_or_none()
-
-    if collection is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Collection not found')
+    document = await get_file_by_id(
+        session=session,
+        current_user=current_user,
+        document_id=document_id
+    )
+    collection = await get_collection_by_id(
+        session=session,
+        current_user=current_user,
+        collection_id=collection_id
+    )
 
     stmt = (
         select(Collection_Document)
