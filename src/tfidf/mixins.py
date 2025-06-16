@@ -14,7 +14,7 @@ class UserRelationMixin:
     @declared_attr
     def user_id(cls) -> Mapped[int]:
         return mapped_column(
-            ForeignKey('user.id'),
+            ForeignKey('user.id', ondelete='cascade'),
         )
 
     @declared_attr
@@ -31,7 +31,7 @@ class DocumentRelationMixin:
     @declared_attr
     def document_id(cls) -> Mapped[int]:
         return mapped_column(
-            ForeignKey('document.id'),
+            ForeignKey('document.id', ondelete='cascade'),
         )
 
     @declared_attr
@@ -48,7 +48,7 @@ class CollectionRelationMixin:
     @declared_attr
     def collection_id(cls) -> Mapped[int]:
         return mapped_column(
-            ForeignKey('collection.id'),
+            ForeignKey('collection.id', ondelete='cascade'),
         )
 
     @declared_attr
