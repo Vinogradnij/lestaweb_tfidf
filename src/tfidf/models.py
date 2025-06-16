@@ -11,15 +11,15 @@ class Document(UserRelationMixin, Base):
     path: Mapped[str]
     title: Mapped[str]
 
-    statistics: Mapped[list['Statistic']] = relationship(back_populates='Document')
-    collection_document: Mapped[list['Collection_Document']] = relationship(back_populates='Document')
+    statistics: Mapped[list['Statistic']] = relationship(back_populates='document')
+    collection_documents: Mapped[list['Collection_Document']] = relationship(back_populates='document')
 
 
 class Collection(UserRelationMixin, Base):
     _user_back_populates = 'collections'
 
-    statistics: Mapped[list['Statistic']] = relationship(back_populates='Collection')
-    collection_document: Mapped[list['Collection_Document']] = relationship(back_populates='Collection')
+    statistics: Mapped[list['Statistic']] = relationship(back_populates='collection')
+    collection_documents: Mapped[list['Collection_Document']] = relationship(back_populates='collection')
 
 
 class Collection_Document(DocumentRelationMixin, CollectionRelationMixin, Base):
