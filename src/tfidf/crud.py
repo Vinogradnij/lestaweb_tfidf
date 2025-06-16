@@ -49,7 +49,7 @@ async def get_files(session: AsyncSession, current_user: UserInDb) -> list[Docum
     documents = documents.scalars().all()
     if documents is None:
         return None
-    results = [DocumentOut(id=doc.id, title=doc.title) for doc in documents.scalars().all()]
+    results = [DocumentOut(id=doc.id, title=doc.title) for doc in documents]
     return results
 
 
