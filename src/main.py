@@ -45,5 +45,4 @@ if __name__ == '__main__':
         'main:app_main',
         host=settings.run.host,
         port=settings.run.port,
-        reload=True,
     )
