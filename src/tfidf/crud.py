@@ -71,3 +71,12 @@ async def get_files_text(session: AsyncSession, current_user: UserInDb, document
             result.append(chunks)
 
     return ''.join(result)
+
+
+async def delete_file(session: AsyncSession, current_user: UserInDb, document_id: int) -> None:
+    document = await get_file_by_id(session=session, current_user=current_user, document_id=document_id)
+
+    await session.delete(document)
+    await session.commit()
+
+    Path(ROOT / Path(document.path)).unlink()

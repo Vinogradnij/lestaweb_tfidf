@@ -6,7 +6,7 @@ from fastapi.responses import HTMLResponse
 from dependencies import session_dep
 from tfidf.files_handler import compute_tfidf
 from tfidf.schemas import OutputResults, DocumentOut
-from tfidf.crud import save_files, get_files, get_files_text
+from tfidf.crud import save_files, get_files, get_files_text, delete_file
 from users.crud import get_current_user
 from users.schemas import UserBase, UserInDb
 
@@ -90,8 +90,13 @@ async def get_document_statistics():
     '/documents/{document_id}',
     summary='Удалить документ'
 )
-async def delete_document():
-    pass
+async def delete_document(
+        session: session_dep,
+        current_user: Annotated[UserInDb, Depends(get_current_user)],
+        document_id: int,
+):
+    await delete_file(session=session, current_user=current_user, document_id=document_id)
+    return {'message': 'Файл успешно удален'}
 
 
 @router.get(
