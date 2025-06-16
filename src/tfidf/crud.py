@@ -184,3 +184,40 @@ async def add_document_to_collection(
     col_doc = Collection_Document(collection_id=collection.id, document_id=document.id)
     session.add(col_doc)
     await session.commit()
+
+
+async def pop_document_from_collection(
+        session: AsyncSession,
+        current_user: UserInDb,
+        document_id: int,
+        collection_id: int
+):
+    document = await get_file_by_id(
+        session=session,
+        current_user=current_user,
+        document_id=document_id
+    )
+    collection = await get_collection_by_id(
+        session=session,
+        current_user=current_user,
+        collection_id=collection_id
+    )
+
+    stmt = (
+        select(Collection_Document)
+        .where(
+            and_(
+                Collection_Document.collection_id == collection.id,
+                Collection_Document.document_id == document.id
+            )
+        )
+    )
+
+    col_doc = await session.execute(stmt)
+    col_doc = col_doc.scalar_one_or_none()
+
+    if col_doc is None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Document not exists in collection')
+
+    await session.delete(col_doc)
+    await session.commit()

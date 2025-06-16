@@ -6,7 +6,7 @@ from fastapi.responses import HTMLResponse
 from dependencies import session_dep
 from tfidf.schemas import DocumentOut, AllCollectionOut, CollectionOnlyIdOut
 from tfidf.crud import save_files, get_files, get_files_text, delete_file, get_collections_with_files, \
-    get_collection_with_files, add_document_to_collection
+    get_collection_with_files, add_document_to_collection, pop_document_from_collection
 from users.crud import get_current_user
 from users.schemas import UserInDb
 
@@ -164,5 +164,17 @@ async def add_document(
     '/collections/{collection_id}/{document_id}',
     summary='Удалить документ из коллекции'
 )
-async def add_document():
-    pass
+async def delete_document_from_collection(
+        session: session_dep,
+        current_user: Annotated[UserInDb, Depends(get_current_user)],
+        collection_id: int,
+        document_id: int,
+):
+    await pop_document_from_collection(
+        session=session,
+        current_user=current_user,
+        document_id=document_id,
+        collection_id=collection_id
+    )
+
+    return {'message': 'Документ удалён из коллекции'}
