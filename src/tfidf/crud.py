@@ -131,3 +131,38 @@ async def get_collection_with_files(
         result.append(DocumentOnlyIdOut(id=col_doc.document.id))
 
     return CollectionOnlyIdOut(documents=result)
+
+
+async def add_document_to_collection(
+        session: AsyncSession,
+        current_user: UserInDb,
+        document_id: int,
+        collection_id: int
+) -> None:
+    document = await get_file_by_id(session=session, current_user=current_user, document_id=document_id)
+    stmt = select(Collection).where(and_(Collection.user_id == current_user.id, Collection.id == collection_id))
+    collection = await session.execute(stmt)
+    collection = collection.scalar_one_or_none()
+
+    if collection is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Collection not found')
+
+    stmt = (
+        select(Collection_Document)
+        .where(
+            and_(
+                Collection_Document.collection_id == collection.id,
+                Collection_Document.document_id == document.id
+            )
+        )
+    )
+
+    col_doc = await session.execute(stmt)
+    col_doc = col_doc.scalar_one_or_none()
+
+    if col_doc is not None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Document exists in collection')
+
+    col_doc = Collection_Document(collection_id=collection.id, document_id=document.id)
+    session.add(col_doc)
+    await session.commit()

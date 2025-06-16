@@ -6,7 +6,7 @@ from fastapi.responses import HTMLResponse
 from dependencies import session_dep
 from tfidf.schemas import DocumentOut, AllCollectionOut, CollectionOnlyIdOut
 from tfidf.crud import save_files, get_files, get_files_text, delete_file, get_collections_with_files, \
-    get_collection_with_files
+    get_collection_with_files, add_document_to_collection
 from users.crud import get_current_user
 from users.schemas import UserInDb
 
@@ -144,8 +144,20 @@ async def get_collection_statistics():
     '/collections/{collection_id}/{document_id}',
     summary='Добавить документ в коллекцию'
 )
-async def add_document():
-    pass
+async def add_document(
+        session: session_dep,
+        current_user: Annotated[UserInDb, Depends(get_current_user)],
+        document_id: int,
+        collection_id: int,
+):
+    await add_document_to_collection(
+        session=session,
+        current_user=current_user,
+        document_id=document_id,
+        collection_id=collection_id
+    )
+
+    return {'message': 'Документ добавлен в коллекцию'}
 
 
 @router.delete(
