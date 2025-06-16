@@ -147,8 +147,8 @@ async def get_collection_statistics():
 async def add_document(
         session: session_dep,
         current_user: Annotated[UserInDb, Depends(get_current_user)],
-        document_id: int,
         collection_id: int,
+        document_id: int,
 ):
     await add_document_to_collection(
         session=session,
