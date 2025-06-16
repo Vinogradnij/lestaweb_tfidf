@@ -1,8 +1,14 @@
-from fastapi import UploadFile, APIRouter, HTTPException, status, Request
+from typing import Annotated
+
+from fastapi import UploadFile, APIRouter, HTTPException, status, Request, Depends
 from fastapi.responses import HTMLResponse
 
+from dependencies import session_dep
 from tfidf.files_handler import compute_tfidf
 from tfidf.schemas import OutputResults
+from tfidf.crud import save_files
+from users.crud import get_current_user
+from users.schemas import UserBase, UserInDb
 
 router = APIRouter(
     tags=['Анализ tf_idf'],
@@ -30,13 +36,18 @@ async def home():
     '/',
     summary='Загрузка файла',
 )
-async def upload_files(files: list[UploadFile]) -> OutputResults:
+async def upload_files(
+        session: session_dep,
+        current_user: Annotated[UserInDb, Depends(get_current_user)],
+        files: list[UploadFile]
+):
     for file in files:
         if file.content_type != 'text/plain':
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid file type")
 
-    results = compute_tfidf(files)
-    return OutputResults(results=results)
+    await save_files(session=session, current_user=current_user, files=files)
+
+    return {'message': 'Файлы успешно загружены'}
 
 
 @router.get(
