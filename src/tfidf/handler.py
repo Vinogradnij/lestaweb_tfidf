@@ -11,23 +11,23 @@ analyzer = MorphAnalyzer()
 STOPWORDS = set(stopwords.words('russian'))
 
 
+class Word:
+    def __init__(self, word: str, number: int):
+        self.word = word
+        self.number = number
+
+
 def clean_string(string: str) -> str:
     string = re.sub(r'[^\w\s-]', '', string)
     string = string.lower()
     return string
 
 
-def compute_tf_in_file(words: dict[str, int]) -> dict[str, float]:
+def compute_tf_in_file(words: list[Word]):
     number_of_all_words = len(words)
-    all_tf: dict[str, float] = {}
-
-    for word, number_of_word in words.items():
-        tf = round(number_of_word/number_of_all_words, 5)
-        all_tf[word] = tf
-
-    result = dict(sorted(all_tf.items(), key=lambda statistics: statistics[1])[:50])
-    return result
-
+    for word in words:
+        tf = round(word.number/number_of_all_words, 5)
+        Word.tf = tf
 
 
 async def analyze_document(file_in: DocumentInDb):
@@ -44,5 +44,9 @@ async def analyze_document(file_in: DocumentInDb):
                     all_words[normal_word] += 1
                 else:
                     all_words[normal_word] = 1
-    tf_50 = compute_tf_in_file(all_words)
-    return tf_50
+    result = [Word(word=word, number=number) for word, number in all_words.items()]
+    compute_tf_in_file(result)
+    return result
+
+
+async def analyze_collection(collection_in: list[DocumentInDb]):
