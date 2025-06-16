@@ -1,7 +1,7 @@
 import aiofiles
 from fastapi import UploadFile, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import Select, and_
+from sqlalchemy import select, and_
 from datetime import datetime, UTC
 from pathlib import Path
 from collections import deque
@@ -41,7 +41,7 @@ async def save_files(session: AsyncSession, current_user: UserInDb, files: list[
 
 
 async def get_files(session: AsyncSession, current_user: UserInDb) -> list[DocumentOut] | None:
-    documents = await session.execute(Select(Document).where(Document.user_id == current_user.id))
+    documents = await session.execute(select(Document).where(Document.user_id == current_user.id))
     documents = documents.scalars().all()
     if documents is None:
         return None
@@ -51,7 +51,7 @@ async def get_files(session: AsyncSession, current_user: UserInDb) -> list[Docum
 
 async def get_file_by_id(session: AsyncSession, current_user: UserInDb, document_id: int) -> Document:
     document = await session.execute(
-        Select(Document).where(and_(Document.user_id == current_user.id, Document.id == document_id))
+        select(Document).where(and_(Document.user_id == current_user.id, Document.id == document_id))
     )
     document = document.scalar_one_or_none()
 
