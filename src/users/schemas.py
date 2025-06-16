@@ -11,6 +11,7 @@ class UserBase(BaseModel):
 
 class UserInDb(UserBase):
     hashed_password: str
+    id: int
 
 
 class UserPassword(PasswordBase, UserBase):
