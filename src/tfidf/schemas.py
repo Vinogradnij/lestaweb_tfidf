@@ -12,6 +12,9 @@ class CollectionOut(BaseModel):
     documents: Sequence[DocumentOut]
 
 
+class AllCollectionOut(BaseModel):
+    collections: Sequence[CollectionOut]
+
 class OutputResults(BaseModel):
     results: list[dict[str, Union[str, list[str]]]]
 
