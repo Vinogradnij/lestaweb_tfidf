@@ -86,7 +86,7 @@ async def delete_file(session: AsyncSession, current_user: UserInDb, document_id
     Path(ROOT / Path(document.path)).unlink()
 
 
-async def get_collections_with_files(session: AsyncSession, current_user: UserInDb) -> Sequence[CollectionOut]:
+async def get_collections_with_files(session: AsyncSession, current_user: UserInDb) -> Sequence[CollectionOut] | None:
     stmt = (
         select(Collection)
         .where(Collection.user_id == current_user.id)
