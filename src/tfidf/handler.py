@@ -49,4 +49,31 @@ async def analyze_document(file_in: DocumentInDb):
     return result
 
 
-async def analyze_collection(collection_in: list[DocumentInDb]):
+async def analyze_collection(collection_in: list[DocumentInDb]) -> list[dict[int, list[Word]]]:
+    collection: deque[list[Word]] = deque()
+    number_of_word_in_collection: dict[str,int] = {}
+    documents: dict[int, list[Word]] = {}
+
+    for file in collection_in:
+        tf_statistics = await analyze_document(file)
+        documents[file.id] = tf_statistics
+        collection.append(tf_statistics)
+
+    for document in collection:
+        for word in document:
+            if word.name in number_of_word_in_collection:
+                number_of_word_in_collection[word.name] += 1
+            else:
+                number_of_word_in_collection[word.name] = 1
+
+    results: list[dict[int, list[Word]]] = []
+
+    for document_id, words in documents.items():
+        sorted_words = sorted(words, key=lambda item: item.tf)[:50]
+        for word in sorted_words:
+            idf = round(log10(len(documents) / number_of_word_in_collection[word.name]), 5)
+            word.idf = idf
+
+        results.append({document_id: sorted_words})
+
+    return results
