@@ -2,6 +2,11 @@ from typing import Union
 from pydantic import BaseModel
 
 
+class DocumentOut(BaseModel):
+    id: int
+    title: str
+
+
 class OutputResults(BaseModel):
     results: list[dict[str, Union[str, list[str]]]]
 
