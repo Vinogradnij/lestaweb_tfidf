@@ -47,7 +47,7 @@ async def get_files(session: AsyncSession, current_user: UserInDb) -> list[Docum
     return results
 
 
-async def get_files_text(session: AsyncSession, current_user: UserInDb, document_id: int) -> str:
+async def get_file_by_id(session: AsyncSession, current_user: UserInDb, document_id: int) -> Document:
     document = await session.execute(
         Select(Document).where(and_(Document.user_id == current_user.id, Document.id == document_id))
     )
@@ -55,6 +55,12 @@ async def get_files_text(session: AsyncSession, current_user: UserInDb, document
 
     if document is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Document not found')
+
+    return document
+
+
+async def get_files_text(session: AsyncSession, current_user: UserInDb, document_id: int) -> str:
+    document = await get_file_by_id(session=session, current_user=current_user, document_id=document_id)
 
     result = deque()
 
