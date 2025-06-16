@@ -4,8 +4,9 @@ from fastapi import UploadFile, APIRouter, HTTPException, status, Request, Depen
 from fastapi.responses import HTMLResponse
 
 from dependencies import session_dep
-from tfidf.schemas import DocumentOut, AllCollectionOut
-from tfidf.crud import save_files, get_files, get_files_text, delete_file, get_collections_with_files
+from tfidf.schemas import DocumentOut, AllCollectionOut, CollectionOnlyIdOut
+from tfidf.crud import save_files, get_files, get_files_text, delete_file, get_collections_with_files, \
+    get_collection_with_files
 from users.crud import get_current_user
 from users.schemas import UserInDb
 
@@ -115,10 +116,20 @@ async def get_collections(
 
 @router.get(
     '/collections/{collection_id}',
-    summary='Получить список входящих в коллекцию id документов'
+    summary='Получить список входящих в коллекцию id документов',
+    response_model=CollectionOnlyIdOut,
 )
-async def get_collection():
-    pass
+async def get_collection(
+        session: session_dep,
+        current_user: Annotated[UserInDb, Depends(get_current_user)],
+        collection_id: int,
+):
+    collection = await get_collection_with_files(
+        session=session,
+        current_user=current_user,
+        collection_id=collection_id
+    )
+    return collection
 
 
 @router.get(

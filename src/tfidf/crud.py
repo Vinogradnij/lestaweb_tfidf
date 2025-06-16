@@ -1,5 +1,3 @@
-from typing import Sequence
-
 import aiofiles
 from fastapi import UploadFile, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,7 +8,7 @@ from collections import deque
 
 from sqlalchemy.orm import selectinload
 
-from tfidf.schemas import DocumentOut, CollectionOut
+from tfidf.schemas import DocumentOut, CollectionOut, CollectionOnlyIdOut, DocumentOnlyIdOut, AllCollectionOut
 from users.schemas import UserInDb
 from tfidf.models import Document, Collection, Collection_Document
 from definitions import ROOT
@@ -105,4 +103,31 @@ async def get_collections_with_files(session: AsyncSession, current_user: UserIn
         for col_doc in collection.collection_documents:
             documents.append(DocumentOut(id=col_doc.document.id, title=col_doc.document.title))
         result.append(CollectionOut(id=collection.id, documents=documents))
-    return result
+    return AllCollectionOut(collections=result)
+
+
+async def get_collection_with_files(
+        session: AsyncSession, current_user: UserInDb, collection_id: int
+) -> CollectionOnlyIdOut:
+    stmt = (
+        select(Collection)
+        .where(and_(Collection.user_id == current_user.id, Collection.id == collection_id))
+        .options(
+            selectinload(Collection.collection_documents)
+            .joinedload(Collection_Document.document)
+        )
+        .order_by(Collection.id)
+    )
+
+    collection = await session.execute(stmt)
+    collection = collection.scalar_one_or_none()
+
+    if collection is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Collection not found')
+
+    result = deque()
+
+    for col_doc in collection.collection_documents:
+        result.append(DocumentOnlyIdOut(id=col_doc.document.id))
+
+    return CollectionOnlyIdOut(documents=result)
