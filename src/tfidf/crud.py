@@ -1,9 +1,10 @@
 import aiofiles
-from fastapi import UploadFile
+from fastapi import UploadFile, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import Select
+from sqlalchemy import Select, and_
 from datetime import datetime, UTC
 from pathlib import Path
+from collections import deque
 
 from tfidf.schemas import DocumentOut
 from users.schemas import UserInDb
@@ -44,3 +45,21 @@ async def get_files(session: AsyncSession, current_user: UserInDb) -> list[Docum
     ds = await session.execute(Select(Document).where(Document.user_id == current_user.id))
     results = [DocumentOut(id=doc.id, title=doc.title) for doc in ds.scalars().all()]
     return results
+
+
+async def get_file(session: AsyncSession, current_user: UserInDb, document_id: int) -> str:
+    document = await session.execute(
+        Select(Document).where(and_(Document.user_id == current_user.id, Document.id == document_id))
+    )
+    document = document.scalar_one_or_none()
+
+    if document is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Document not found')
+
+    result = deque()
+
+    async with aiofiles.open(document.path) as local_file:
+        while chunks := await local_file.read(1024):
+            result.append(chunks)
+
+    return ''.join(result)
