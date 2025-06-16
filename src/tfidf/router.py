@@ -4,11 +4,10 @@ from fastapi import UploadFile, APIRouter, HTTPException, status, Request, Depen
 from fastapi.responses import HTMLResponse
 
 from dependencies import session_dep
-from tfidf.files_handler import compute_tfidf
-from tfidf.schemas import OutputResults, DocumentOut
-from tfidf.crud import save_files, get_files, get_files_text, delete_file
+from tfidf.schemas import DocumentOut, AllCollectionOut
+from tfidf.crud import save_files, get_files, get_files_text, delete_file, get_collections_with_files
 from users.crud import get_current_user
-from users.schemas import UserBase, UserInDb
+from users.schemas import UserInDb
 
 router = APIRouter(
     tags=['Анализ tf_idf'],
@@ -101,10 +100,17 @@ async def delete_document(
 
 @router.get(
     '/collections',
-    summary='Получить список коллекций и список входящих в них документов'
+    summary='Получить список коллекций и список входящих в них документов',
+    response_model=AllCollectionOut
 )
-async def get_collections():
-    pass
+async def get_collections(
+        session: session_dep,
+        current_user: Annotated[UserInDb, Depends(get_current_user)],
+):
+    collections = await get_collections_with_files(session=session, current_user=current_user)
+    if not collections:
+        return {'message': 'У пользователя нет коллекций'}
+    return collections
 
 
 @router.get(

@@ -1,3 +1,5 @@
+from typing import Sequence
+
 import aiofiles
 from fastapi import UploadFile, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -6,7 +8,9 @@ from datetime import datetime, UTC
 from pathlib import Path
 from collections import deque
 
-from tfidf.schemas import DocumentOut
+from sqlalchemy.orm import selectinload
+
+from tfidf.schemas import DocumentOut, CollectionOut
 from users.schemas import UserInDb
 from tfidf.models import Document, Collection, Collection_Document
 from definitions import ROOT
@@ -80,3 +84,25 @@ async def delete_file(session: AsyncSession, current_user: UserInDb, document_id
     await session.commit()
 
     Path(ROOT / Path(document.path)).unlink()
+
+
+async def get_collections_with_files(session: AsyncSession, current_user: UserInDb) -> Sequence[CollectionOut]:
+    stmt = (
+        select(Collection)
+        .where(Collection.user_id == current_user.id)
+        .options(
+            selectinload(Collection.collection_documents)
+            .joinedload(Collection_Document.document)
+        )
+        .order_by(Collection.id)
+    )
+    collections = await session.scalars(stmt)
+    if collections is None:
+        return None
+    result = deque()
+    for collection in collections:
+        documents = deque()
+        for col_doc in collection.collection_documents:
+            documents.append(DocumentOut(id=col_doc.document.id, title=col_doc.document.title))
+        result.append(CollectionOut(id=collection.id, documents=documents))
+    return result
