@@ -38,3 +38,7 @@ class Statistic(DocumentRelationMixin, CollectionRelationMixin, Base):
     word: Mapped[str]
     tf: Mapped[float]
     idf: Mapped[float]
+
+    __table_args__ = (
+        UniqueConstraint('document_id', 'collection_id', 'word', name='unique_document_collection_word'),
+    )
