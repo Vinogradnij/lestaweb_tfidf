@@ -1,5 +1,5 @@
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, relationship
+from sqlalchemy import UniqueConstraint
 
 from database import Base
 from tfidf.mixins import UserRelationMixin, DocumentRelationMixin, CollectionRelationMixin
@@ -25,6 +25,10 @@ class Collection(UserRelationMixin, Base):
 class Collection_Document(DocumentRelationMixin, CollectionRelationMixin, Base):
     _document_back_populates = 'collection_documents'
     _collection_back_populates = 'collection_documents'
+
+    __table_args__ = (
+        UniqueConstraint('document_id', 'collection_id', name='unique_document_collection'),
+    )
 
 
 class Statistic(DocumentRelationMixin, CollectionRelationMixin, Base):
