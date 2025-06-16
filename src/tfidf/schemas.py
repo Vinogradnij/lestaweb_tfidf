@@ -1,10 +1,15 @@
-from typing import Union
+from typing import Union, Sequence
 from pydantic import BaseModel
 
 
 class DocumentOut(BaseModel):
     id: int
     title: str
+
+
+class CollectionOut(BaseModel):
+    id: int
+    documents: Sequence[DocumentOut]
 
 
 class OutputResults(BaseModel):
