@@ -60,6 +60,8 @@ async def get_documents(
         current_user: Annotated[UserInDb, Depends(get_current_user)],
 ):
     documents = await get_files(session=session, current_user=current_user)
+    if documents is None:
+        return {'message': 'У пользователя ещё нет файлов'}
     return documents
 
 

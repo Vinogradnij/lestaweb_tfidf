@@ -41,9 +41,12 @@ async def save_files(session: AsyncSession, current_user: UserInDb, files: list[
     await session.commit()
 
 
-async def get_files(session: AsyncSession, current_user: UserInDb) -> list[DocumentOut] | list[None]:
-    ds = await session.execute(Select(Document).where(Document.user_id == current_user.id))
-    results = [DocumentOut(id=doc.id, title=doc.title) for doc in ds.scalars().all()]
+async def get_files(session: AsyncSession, current_user: UserInDb) -> list[DocumentOut] | None:
+    documents = await session.execute(Select(Document).where(Document.user_id == current_user.id))
+    documents = documents.scalars().all()
+    if documents is None:
+        return None
+    results = [DocumentOut(id=doc.id, title=doc.title) for doc in documents.scalars().all()]
     return results
 
 
