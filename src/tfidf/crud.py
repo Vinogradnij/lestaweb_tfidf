@@ -47,7 +47,7 @@ async def get_files(session: AsyncSession, current_user: UserInDb) -> list[Docum
     return results
 
 
-async def get_file(session: AsyncSession, current_user: UserInDb, document_id: int) -> str:
+async def get_files_text(session: AsyncSession, current_user: UserInDb, document_id: int) -> str:
     document = await session.execute(
         Select(Document).where(and_(Document.user_id == current_user.id, Document.id == document_id))
     )

@@ -6,7 +6,7 @@ from fastapi.responses import HTMLResponse
 from dependencies import session_dep
 from tfidf.files_handler import compute_tfidf
 from tfidf.schemas import OutputResults, DocumentOut
-from tfidf.crud import save_files, get_files, get_file
+from tfidf.crud import save_files, get_files, get_files_text
 from users.crud import get_current_user
 from users.schemas import UserBase, UserInDb
 
@@ -72,7 +72,7 @@ async def get_document(
         current_user: Annotated[UserInDb, Depends(get_current_user)],
         document_id: int,
 ):
-    document = await get_file(session=session, current_user=current_user, document_id=document_id)
+    document = await get_files_text(session=session, current_user=current_user, document_id=document_id)
     return document
 
 
