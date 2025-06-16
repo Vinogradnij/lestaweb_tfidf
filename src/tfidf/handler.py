@@ -12,8 +12,8 @@ STOPWORDS = set(stopwords.words('russian'))
 
 
 class Word:
-    def __init__(self, word: str, number: int):
-        self.word = word
+    def __init__(self, name: str, number: int):
+        self.name = name
         self.number = number
 
 
@@ -44,7 +44,7 @@ async def analyze_document(file_in: DocumentInDb):
                     all_words[normal_word] += 1
                 else:
                     all_words[normal_word] = 1
-    result = [Word(word=word, number=number) for word, number in all_words.items()]
+    result = [Word(name=name, number=number) for name, number in all_words.items()]
     compute_tf_in_file(result)
     return result
 
