@@ -2,6 +2,12 @@ from typing import Union, Sequence
 from pydantic import BaseModel
 
 
+class DocumentInDb(BaseModel):
+    id: int
+    title: str
+    path: str
+
+
 class DocumentOut(BaseModel):
     id: int
     title: str
