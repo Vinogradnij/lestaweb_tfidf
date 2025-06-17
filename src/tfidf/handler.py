@@ -69,14 +69,25 @@ async def analyze_document(file_in: DocumentInDb):
     return result
 
 
-async def analyze_collection(collection_in: list[DocumentInDb]) -> list[dict[int, list[Word]]]:
+async def analyze_collection(
+        collection_in: list[DocumentInDb],
+        merged_tf: bool = False,
+        collection_id: int|None = None
+) -> list[dict[int, list[Word]]]:
     collection: deque[list[Word]] = deque()
     number_of_word_in_collection: dict[str,int] = {}
     documents: dict[int, list[Word]] = {}
 
-    for file in collection_in:
+    if not merged_tf:
+        for file in collection_in:
+            tf_statistics = await analyze_document(file)
+            documents[file.id] = tf_statistics
+            collection.append(tf_statistics)
+    else:
+        tmp_file_path = await merge_files(collection_in)
+        file = DocumentInDb(id=0, title='', path=tmp_file_path)
         tf_statistics = await analyze_document(file)
-        documents[file.id] = tf_statistics
+        documents[collection_id] = tf_statistics
         collection.append(tf_statistics)
 
     for document in collection:
@@ -91,7 +102,7 @@ async def analyze_collection(collection_in: list[DocumentInDb]) -> list[dict[int
     for document_id, words in documents.items():
         sorted_words = sorted(words, key=lambda item: item.tf)[:50]
         for word in sorted_words:
-            idf = round(log10(len(documents) / number_of_word_in_collection[word.name]), 5)
+            idf = round(log10(len(collection_in) / number_of_word_in_collection[word.name]), 5)
             word.idf = idf
 
         results.append({document_id: sorted_words})
