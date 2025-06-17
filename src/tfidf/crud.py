@@ -2,6 +2,7 @@ import aiofiles
 from fastapi import UploadFile, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_
+from sqlalchemy.dialects.postgresql import insert
 from datetime import datetime, UTC
 from pathlib import Path
 from collections import deque
@@ -229,6 +230,11 @@ async def pop_document_from_collection(
 
     await session.delete(col_doc)
     await session.commit()
+    await compute_statistics(
+        session=session,
+        current_user=current_user,
+        collection_id=collection_id
+    )
 
 
 async def compute_statistics(
@@ -267,21 +273,27 @@ async def compute_statistics(
         for document_id, words in document_statistic.items():
             list_statistic_word_out = deque()
             for word in words:
-                statistic = Statistic(
-                    collection_id=collection_id,
+                list_statistic_word_out.append(
+                    StatisticWordOut(
+                        word=word.name,
+                        tf=word.tf,
+                        idf=word.idf
+                    )
+                )
+                stmt = insert(Statistic).values(
                     document_id=document_id,
+                    collection_id=collection_id,
                     word=word.name,
                     tf=word.tf,
                     idf=word.idf
+                ).on_conflict_do_update(
+                    index_elements=['document_id', 'collection_id', 'word'],
+                    set_={
+                        'tf': word.tf,
+                        'idf': word.idf,
+                    }
                 )
-                list_statistic_word_out.append(
-                    StatisticWordOut(
-                        word=statistic.word,
-                        tf=statistic.tf,
-                        idf=statistic.idf
-                    )
-                )
-                session.add(statistic)
+                await session.execute(stmt)
 
             statistics_out.append({document_id: list(list_statistic_word_out)})
     await session.commit()
