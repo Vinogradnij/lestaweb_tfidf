@@ -17,10 +17,6 @@ class DocumentOnlyIdOut(BaseModel):
     id: int
 
 
-class CollectionOnlyIdOut(BaseModel):
-    documents: Sequence[DocumentOnlyIdOut]
-
-
 class CollectionOut(BaseModel):
     id: int
     documents: Sequence[DocumentOut]

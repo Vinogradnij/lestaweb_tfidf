@@ -4,8 +4,7 @@ from fastapi import UploadFile, APIRouter, HTTPException, status, Depends
 from fastapi.responses import HTMLResponse
 
 from dependencies import session_dep
-from tfidf.schemas import DocumentOut, CollectionOnlyIdOut, StatisticCollectionOut, StatisticWordOut, \
-    CollectionOut
+from tfidf.schemas import DocumentOut, StatisticCollectionOut, StatisticWordOut, CollectionOut, DocumentOnlyIdOut
 from tfidf.crud import save_files, get_files, get_files_text, delete_file, get_collections_with_files, \
     get_collection_with_files, add_document_to_collection, pop_document_from_collection, compute_statistics, \
     get_statistic_from_document, get_statistic_from_collection
@@ -136,7 +135,7 @@ async def get_collections(
 @router.get(
     '/collections/{collection_id}',
     summary='Получить список входящих в коллекцию id документов',
-    response_model=CollectionOnlyIdOut,
+    response_model=list[DocumentOnlyIdOut],
 )
 async def get_collection(
         session: session_dep,
