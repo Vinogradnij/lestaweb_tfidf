@@ -27,7 +27,7 @@ async def save_files(session: AsyncSession, current_user: UserInDb, files: list[
         filename = file.filename
         date = datetime.now(UTC).strftime('%Y-%m-%d_%H:%M:%S')
         path = f'src/files/{username}/{date}/{filename}'
-        Path(f'{ROOT}/src/files/{username}/{date}').mkdir(parents=True, exist_ok=True  )
+        Path(f'{ROOT}/src/files/{username}/{date}').mkdir(parents=True, exist_ok=True)
 
         async with aiofiles.open(path, 'wb') as local_file:
             while chunks := await file.read(1024):
@@ -306,3 +306,50 @@ async def get_statistic_from_document(
 
     return list(result)
 
+
+async def get_statistic_from_collection(
+        session: AsyncSession,
+        current_user: UserInDb,
+        collection_id: int
+) -> list[StatisticWordOut]:
+    stmt = (
+        select(Collection)
+        .where(and_(Collection.user_id == current_user.id, Collection.id == collection_id))
+        .options(
+            selectinload(Collection.collection_documents)
+            .joinedload(Collection_Document.document)
+        )
+        .order_by(Collection.id)
+    )
+
+    collection = await session.execute(stmt)
+    collection = collection.scalar_one_or_none()
+
+    if collection is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Collection not found')
+
+    documents: list[DocumentInDb] = []
+
+    for col_doc in collection.collection_documents:
+        documents.append(
+            DocumentInDb(
+                id=col_doc.document.id, title=col_doc.document.title, path=col_doc.document.path
+            )
+        )
+
+    statistics = await analyze_collection(documents, merged_tf=True, collection_id=collection_id)
+    statistics_out = deque()
+    for document_statistic in statistics:
+        for document_id, words in document_statistic.items():
+            list_statistic_word_out = deque()
+            for word in words:
+                list_statistic_word_out.append(
+                    StatisticWordOut(
+                        word=word.name,
+                        tf=word.tf,
+                        idf=word.idf
+                    )
+                )
+            statistics_out.extend(list_statistic_word_out)
+
+    return list(statistics_out)
