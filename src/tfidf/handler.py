@@ -87,6 +87,7 @@ async def analyze_collection(
         tmp_file_path = await merge_files(collection_in)
         file = DocumentInDb(id=0, title='', path=tmp_file_path)
         tf_statistics = await analyze_document(file)
+        Path(tmp_file_path).unlink()
         documents[collection_id] = tf_statistics
         collection.append(tf_statistics)
 
