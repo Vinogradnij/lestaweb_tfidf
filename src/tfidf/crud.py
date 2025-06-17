@@ -187,6 +187,11 @@ async def add_document_to_collection(
     col_doc = Collection_Document(collection_id=collection.id, document_id=document.id)
     session.add(col_doc)
     await session.commit()
+    await compute_statistics(
+        session=session,
+        current_user=current_user,
+        collection_id=collection_id
+    )
 
 
 async def pop_document_from_collection(
