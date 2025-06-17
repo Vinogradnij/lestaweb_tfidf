@@ -1,4 +1,5 @@
 import re
+
 import aiofiles
 from pymorphy3 import MorphAnalyzer
 from math import log10
@@ -15,6 +16,8 @@ class Word:
     def __init__(self, name: str, number: int):
         self.name = name
         self.number = number
+        self.tf: float|None = None
+        self.idf: float|None = None
 
 
 def clean_string(string: str) -> str:
@@ -27,7 +30,7 @@ def compute_tf_in_file(words: list[Word]):
     number_of_all_words = len(words)
     for word in words:
         tf = round(word.number/number_of_all_words, 5)
-        Word.tf = tf
+        word.tf = tf
 
 
 async def analyze_document(file_in: DocumentInDb):
