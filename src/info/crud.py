@@ -2,7 +2,7 @@ from datetime import datetime
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from tfidf.schemas import MetricsOut
+from info.schemas import MetricsOut
 
 
 async def get_metrics_tfidf(session: AsyncSession) -> MetricsOut:

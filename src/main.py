@@ -6,6 +6,7 @@ import uvicorn
 from database import db_handler
 from tfidf.router import router as api_router
 from users.router import router as users_router
+from info.router import router as info_router
 from config import settings
 
 origins = [
@@ -19,7 +20,7 @@ async def lifespan(app: FastAPI):
 
 app_main = FastAPI(
     lifespan=lifespan,
-    version='1.2.0'
+    version='1.3.0'
 )
 app_main.add_middleware(
     CORSMiddleware,
@@ -35,11 +36,13 @@ app_main.include_router(
 app_main.include_router(
     users_router,
 )
+app_main.include_router(
+    info_router,
+)
 
 if __name__ == '__main__':
     uvicorn.run(
         'main:app_main',
         host=settings.run.host,
         port=settings.run.port,
-        reload=True,
     )

@@ -1,7 +1,6 @@
 services:
   backend:
-    build:
-        dockerfile: ./Dockerfile
+    image: vinogradnij/tfidf_app:1.3.0
     container_name: backend_tfidf
     env_file:
       - path: .env-template
@@ -15,12 +14,8 @@ services:
     depends_on:
       database:
         condition: service_healthy
-    develop:
-      watch:
-        - action: rebuild
-          path: ./src
-        - action: rebuild
-          path: requirements.txt
+    volumes:
+      - ./src/files:/app/src/files
 
   database:
     image: postgres:17.5-alpine3.21

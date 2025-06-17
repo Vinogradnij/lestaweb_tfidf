@@ -1,14 +1,15 @@
 from typing import Annotated
 
-from fastapi import UploadFile, APIRouter, HTTPException, status, Request
-from fastapi.params import Depends
+from fastapi import UploadFile, APIRouter, HTTPException, status, Depends
 from fastapi.responses import HTMLResponse
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from database import db_handler
-from tfidf.files_handler import compute_tfidf
-from tfidf.schemas import OutputResults, MetricsOut
-from tfidf.service import get_metrics_tfidf
+from dependencies import session_dep
+from tfidf.schemas import DocumentOut, StatisticCollectionOut, StatisticWordOut, CollectionOut, DocumentOnlyIdOut
+from tfidf.crud import save_files, get_files, get_files_text, delete_file, get_collections_with_files, \
+    get_collection_with_files, add_document_to_collection, pop_document_from_collection, compute_statistics, \
+    get_statistic_from_document, get_statistic_from_collection
+from users.crud import get_current_user
+from users.schemas import UserInDb
 
 router = APIRouter(
     tags=['Анализ tf_idf'],
@@ -34,43 +35,175 @@ async def home():
 
 @router.post(
     '/',
-    summary='Загрузка файла',
+    summary='Загрузка файлов',
+    response_model=StatisticCollectionOut,
 )
-async def upload_files(files: list[UploadFile]) -> OutputResults:
+async def upload_files(
+        session: session_dep,
+        current_user: Annotated[UserInDb, Depends(get_current_user)],
+        files: list[UploadFile]
+):
     for file in files:
         if file.content_type != 'text/plain':
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid file type")
 
-    results = compute_tfidf(files)
-    return OutputResults(results=results)
+    collection_id = await save_files(session=session, current_user=current_user, files=files)
+
+    results = await compute_statistics(
+        session=session,
+        current_user=current_user,
+        collection_id=collection_id
+    )
+
+    return results
 
 
 @router.get(
-    '/metrics',
-    summary='Метрики приложения',
-    tags=['Служебная информация'],
-    response_model=MetricsOut
+    '/documents',
+    summary='Получить список документов пользователя',
+    response_model=list[DocumentOut]
 )
-async def get_metrics(
-        session: Annotated[AsyncSession, Depends(db_handler.session_dep)],
+async def get_documents(
+        session: session_dep,
+        current_user: Annotated[UserInDb, Depends(get_current_user)],
 ):
-    metrics = await get_metrics_tfidf(session=session)
-    return metrics
+    documents = await get_files(session=session, current_user=current_user)
+    if documents is None:
+        return {'message': 'У пользователя ещё нет файлов'}
+    return documents
 
 
 @router.get(
-    '/status',
-    summary='Статус приложения',
-    tags=['Служебная информация'],
+    '/documents/{document_id}',
+    summary='Получить содержимое документа'
 )
-async def get_status():
-    return {'status': 'OK'}
+async def get_document(
+        session: session_dep,
+        current_user: Annotated[UserInDb, Depends(get_current_user)],
+        document_id: int,
+):
+    document = await get_files_text(session=session, current_user=current_user, document_id=document_id)
+    return document
+
 
 @router.get(
-    '/version',
-    summary='Версия приложения',
-    tags=['Служебная информация'],
+    '/documents/{document_id}/statistics',
+    summary='Получить статистику по данному документу',
+    response_model=list[StatisticWordOut],
 )
-async def get_version(request: Request):
-    version = request.app.version
-    return {'version': version}
+async def get_document_statistics(
+        session: session_dep,
+        current_user: Annotated[UserInDb, Depends(get_current_user)],
+        document_id: int,
+):
+    result = await get_statistic_from_document(
+        session=session,
+        current_user=current_user,
+        document_id=document_id
+    )
+    return result
+
+
+@router.delete(
+    '/documents/{document_id}',
+    summary='Удалить документ'
+)
+async def delete_document(
+        session: session_dep,
+        current_user: Annotated[UserInDb, Depends(get_current_user)],
+        document_id: int,
+):
+    await delete_file(session=session, current_user=current_user, document_id=document_id)
+    return {'message': 'Файл успешно удален'}
+
+
+@router.get(
+    '/collections',
+    summary='Получить список коллекций и список входящих в них документов',
+    response_model=list[CollectionOut]
+)
+async def get_collections(
+        session: session_dep,
+        current_user: Annotated[UserInDb, Depends(get_current_user)],
+):
+    collections = await get_collections_with_files(session=session, current_user=current_user)
+    if not collections:
+        return {'message': 'У пользователя нет коллекций'}
+    return collections
+
+
+@router.get(
+    '/collections/{collection_id}',
+    summary='Получить список входящих в коллекцию id документов',
+    response_model=list[DocumentOnlyIdOut],
+)
+async def get_collection(
+        session: session_dep,
+        current_user: Annotated[UserInDb, Depends(get_current_user)],
+        collection_id: int,
+):
+    collection = await get_collection_with_files(
+        session=session,
+        current_user=current_user,
+        collection_id=collection_id
+    )
+    return collection
+
+
+@router.get(
+    '/collections/{collection_id}/statistics',
+    summary='Получить статистику по коллекции',
+    response_model=list[StatisticWordOut]
+)
+async def get_collection_statistics(
+        session: session_dep,
+        current_user: Annotated[UserInDb, Depends(get_current_user)],
+        collection_id: int
+):
+    result = await get_statistic_from_collection(
+        session=session,
+        current_user=current_user,
+        collection_id=collection_id
+    )
+
+    return result
+
+
+@router.post(
+    '/collections/{collection_id}/{document_id}',
+    summary='Добавить документ в коллекцию'
+)
+async def add_document(
+        session: session_dep,
+        current_user: Annotated[UserInDb, Depends(get_current_user)],
+        collection_id: int,
+        document_id: int,
+):
+    await add_document_to_collection(
+        session=session,
+        current_user=current_user,
+        document_id=document_id,
+        collection_id=collection_id
+    )
+
+    return {'message': 'Документ добавлен в коллекцию'}
+
+
+@router.delete(
+    '/collections/{collection_id}/{document_id}',
+    summary='Удалить документ из коллекции'
+)
+async def delete_document_from_collection(
+        session: session_dep,
+        current_user: Annotated[UserInDb, Depends(get_current_user)],
+        collection_id: int,
+        document_id: int,
+):
+    await pop_document_from_collection(
+        session=session,
+        current_user=current_user,
+        document_id=document_id,
+        collection_id=collection_id
+    )
+
+    return {'message': 'Документ удалён из коллекции'}
