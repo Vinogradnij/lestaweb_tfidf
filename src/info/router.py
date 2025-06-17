@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request
 
 from dependencies import session_dep
 from info.schemas import MetricsOut
-from info.service import get_metrics_tfidf
+from info.crud import get_metrics_tfidf
 
 router = APIRouter(
     tags=['Служебная информация'],
