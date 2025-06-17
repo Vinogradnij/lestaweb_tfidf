@@ -1,12 +1,12 @@
 from typing import Annotated
 
-from fastapi import UploadFile, APIRouter, HTTPException, status, Request, Depends
+from fastapi import UploadFile, APIRouter, HTTPException, status, Depends
 from fastapi.responses import HTMLResponse
 
 from dependencies import session_dep
-from tfidf.schemas import DocumentOut, AllCollectionOut, CollectionOnlyIdOut
+from tfidf.schemas import DocumentOut, AllCollectionOut, CollectionOnlyIdOut, StatisticCollectionOut
 from tfidf.crud import save_files, get_files, get_files_text, delete_file, get_collections_with_files, \
-    get_collection_with_files, add_document_to_collection, pop_document_from_collection
+    get_collection_with_files, add_document_to_collection, pop_document_from_collection, compute_statistics
 from users.crud import get_current_user
 from users.schemas import UserInDb
 
@@ -34,7 +34,8 @@ async def home():
 
 @router.post(
     '/',
-    summary='Загрузка файла',
+    summary='Загрузка файлов',
+    response_model=StatisticCollectionOut,
 )
 async def upload_files(
         session: session_dep,
@@ -47,7 +48,13 @@ async def upload_files(
 
     collection_id = await save_files(session=session, current_user=current_user, files=files)
 
-    return {'message': 'Файлы успешно загружены'}
+    results = await compute_statistics(
+        session=session,
+        current_user=current_user,
+        collection_id=collection_id
+    )
+
+    return results
 
 
 @router.get(

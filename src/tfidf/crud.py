@@ -8,9 +8,11 @@ from collections import deque
 
 from sqlalchemy.orm import selectinload
 
-from tfidf.schemas import DocumentOut, CollectionOut, CollectionOnlyIdOut, DocumentOnlyIdOut, AllCollectionOut
+from tfidf.handler import analyze_collection
+from tfidf.schemas import DocumentOut, CollectionOut, CollectionOnlyIdOut, DocumentOnlyIdOut, AllCollectionOut, \
+    DocumentInDb, StatisticCollectionOut, StatisticWordOut
 from users.schemas import UserInDb
-from tfidf.models import Document, Collection, Collection_Document
+from tfidf.models import Document, Collection, Collection_Document, Statistic
 from definitions import ROOT
 
 
@@ -222,3 +224,61 @@ async def pop_document_from_collection(
 
     await session.delete(col_doc)
     await session.commit()
+
+
+async def compute_statistics(
+        session: AsyncSession,
+        current_user: UserInDb,
+        collection_id: int
+) -> StatisticCollectionOut:
+    stmt = (
+        select(Collection)
+        .where(and_(Collection.user_id == current_user.id, Collection.id == collection_id))
+        .options(
+            selectinload(Collection.collection_documents)
+            .joinedload(Collection_Document.document)
+        )
+        .order_by(Collection.id)
+    )
+
+    collection = await session.execute(stmt)
+    collection = collection.scalar_one_or_none()
+
+    if collection is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Collection not found')
+
+    documents: list[DocumentInDb] = []
+
+    for col_doc in collection.collection_documents:
+        documents.append(
+            DocumentInDb(
+                id=col_doc.document.id, title=col_doc.document.title, path=col_doc.document.path
+            )
+        )
+
+    statistics = await analyze_collection(documents)
+    statistics_out = deque()
+    for document_statistic in statistics:
+        for document_id, words in document_statistic.items():
+            list_statistic_word_out = deque()
+            for word in words:
+                statistic = Statistic(
+                    collection_id=collection_id,
+                    document_id=document_id,
+                    word=word.name,
+                    tf=word.tf,
+                    idf=word.idf
+                )
+                list_statistic_word_out.append(
+                    StatisticWordOut(
+                        word=statistic.word,
+                        tf=statistic.tf,
+                        idf=statistic.idf
+                    )
+                )
+                session.add(statistic)
+
+            statistics_out.append({document_id: list(list_statistic_word_out)})
+    await session.commit()
+
+    return StatisticCollectionOut(collection=list(statistics_out))
