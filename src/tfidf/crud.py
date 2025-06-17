@@ -282,3 +282,27 @@ async def compute_statistics(
     await session.commit()
 
     return StatisticCollectionOut(collection=list(statistics_out))
+
+
+async def get_statistic_from_document(
+        session: AsyncSession,
+        current_user: UserInDb,
+        document_id: int
+) -> list[StatisticWordOut]:
+    stmt = (
+        select(Document)
+        .where(and_(Document.user_id == current_user.id, Document.id == document_id))
+        .options(
+            selectinload(Document.statistics)
+        )
+    )
+    document = await session.execute(stmt)
+    document = document.scalar_one_or_none()
+    if document is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Document not found')
+    result = deque()
+    for statistic in document.statistics:
+        result.append(StatisticWordOut(word=statistic.word, tf=statistic.tf, idf=statistic.idf))
+
+    return list(result)
+

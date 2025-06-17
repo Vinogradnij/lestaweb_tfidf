@@ -4,9 +4,10 @@ from fastapi import UploadFile, APIRouter, HTTPException, status, Depends
 from fastapi.responses import HTMLResponse
 
 from dependencies import session_dep
-from tfidf.schemas import DocumentOut, AllCollectionOut, CollectionOnlyIdOut, StatisticCollectionOut
+from tfidf.schemas import DocumentOut, AllCollectionOut, CollectionOnlyIdOut, StatisticCollectionOut, StatisticWordOut
 from tfidf.crud import save_files, get_files, get_files_text, delete_file, get_collections_with_files, \
-    get_collection_with_files, add_document_to_collection, pop_document_from_collection, compute_statistics
+    get_collection_with_files, add_document_to_collection, pop_document_from_collection, compute_statistics, \
+    get_statistic_from_document
 from users.crud import get_current_user
 from users.schemas import UserInDb
 
@@ -87,10 +88,20 @@ async def get_document(
 
 @router.get(
     '/documents/{document_id}/statistics',
-    summary='Получить статистику по данному документу'
+    summary='Получить статистику по данному документу',
+    response_model=list[StatisticWordOut],
 )
-async def get_document_statistics():
-    pass
+async def get_document_statistics(
+        session: session_dep,
+        current_user: Annotated[UserInDb, Depends(get_current_user)],
+        document_id: int,
+):
+    result = await get_statistic_from_document(
+        session=session,
+        current_user=current_user,
+        document_id=document_id
+    )
+    return result
 
 
 @router.delete(
