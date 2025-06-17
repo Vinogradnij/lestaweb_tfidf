@@ -30,6 +30,16 @@ class AllCollectionOut(BaseModel):
     collections: Sequence[CollectionOut]
 
 
+class StatisticWordOut(BaseModel):
+    word: str
+    tf: float
+    idf: float
+
+
+class StatisticCollectionOut(BaseModel):
+    collection: list[dict[int, list[StatisticWordOut]]]
+
+
 class OutputResults(BaseModel):
     results: list[dict[str, Union[str, list[str]]]]
 
