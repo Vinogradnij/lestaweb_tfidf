@@ -26,10 +26,6 @@ class CollectionOut(BaseModel):
     documents: Sequence[DocumentOut]
 
 
-class AllCollectionOut(BaseModel):
-    collections: Sequence[CollectionOut]
-
-
 class StatisticWordOut(BaseModel):
     word: str
     tf: float

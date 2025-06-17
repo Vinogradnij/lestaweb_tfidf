@@ -9,8 +9,8 @@ from collections import deque
 from sqlalchemy.orm import selectinload
 
 from tfidf.handler import analyze_collection
-from tfidf.schemas import DocumentOut, CollectionOut, CollectionOnlyIdOut, DocumentOnlyIdOut, AllCollectionOut, \
-    DocumentInDb, StatisticCollectionOut, StatisticWordOut
+from tfidf.schemas import DocumentOut, CollectionOut, CollectionOnlyIdOut, DocumentOnlyIdOut, DocumentInDb, \
+    StatisticCollectionOut, StatisticWordOut
 from users.schemas import UserInDb
 from tfidf.models import Document, Collection, Collection_Document, Statistic
 from definitions import ROOT
@@ -102,7 +102,7 @@ async def get_collection_by_id(
     return collection
 
 
-async def get_collections_with_files(session: AsyncSession, current_user: UserInDb) -> AllCollectionOut | None:
+async def get_collections_with_files(session: AsyncSession, current_user: UserInDb) -> list[CollectionOut] | None:
     stmt = (
         select(Collection)
         .where(Collection.user_id == current_user.id)
@@ -121,7 +121,7 @@ async def get_collections_with_files(session: AsyncSession, current_user: UserIn
         for col_doc in collection.collection_documents:
             documents.append(DocumentOut(id=col_doc.document.id, title=col_doc.document.title))
         result.append(CollectionOut(id=collection.id, documents=documents))
-    return AllCollectionOut(collections=result)
+    return list(result)
 
 
 async def get_collection_with_files(

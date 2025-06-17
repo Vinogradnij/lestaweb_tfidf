@@ -4,7 +4,8 @@ from fastapi import UploadFile, APIRouter, HTTPException, status, Depends
 from fastapi.responses import HTMLResponse
 
 from dependencies import session_dep
-from tfidf.schemas import DocumentOut, AllCollectionOut, CollectionOnlyIdOut, StatisticCollectionOut, StatisticWordOut
+from tfidf.schemas import DocumentOut, CollectionOnlyIdOut, StatisticCollectionOut, StatisticWordOut, \
+    CollectionOut
 from tfidf.crud import save_files, get_files, get_files_text, delete_file, get_collections_with_files, \
     get_collection_with_files, add_document_to_collection, pop_document_from_collection, compute_statistics, \
     get_statistic_from_document, get_statistic_from_collection
@@ -120,7 +121,7 @@ async def delete_document(
 @router.get(
     '/collections',
     summary='Получить список коллекций и список входящих в них документов',
-    response_model=AllCollectionOut
+    response_model=list[CollectionOut]
 )
 async def get_collections(
         session: session_dep,
