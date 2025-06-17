@@ -2,15 +2,22 @@ services:
   backend:
     image: vinogradnij/tfidf_app:1.3.0
     container_name: backend_tfidf
-    env_file:
-      - path: .env-template
-        required: true
-      - path: .env
-        required: false
     ports:
       - "${TFIDF__RUN__PORT}:${TFIDF__RUN__PORT}"
     entrypoint: ["./src/prestart.sh"]
     command: ["python", "src/main.py"]
+    environment:
+      - TFIDF__DB__HOST=${TFIDF__DB__HOST}
+      - TFIDF__DB__PORT=${TFIDF__DB__PORT}
+      - TFIDF__DB__USER=${TFIDF__DB__USER}
+      - TFIDF__DB__PASSWORD=${TFIDF__DB__PASSWORD}
+      - TFIDF__DB__NAME=${TFIDF__DB__NAME}
+
+      - TFIDF__RUN__HOST=${TFIDF__RUN__HOST}
+      - TFIDF__RUN__PORT=${TFIDF__RUN__PORT}
+
+      - TFIDF__SECURITY__SECRET_KEY=${TFIDF__SECURITY__SECRET_KEY}
+      - TFIDF__SECURITY__ALGORITHM=${TFIDF__SECURITY__ALGORITHM}
     depends_on:
       database:
         condition: service_healthy
