@@ -1,4 +1,6 @@
 import re
+from datetime import datetime, UTC
+from pathlib import Path
 
 import aiofiles
 from pymorphy3 import MorphAnalyzer
@@ -6,6 +8,7 @@ from math import log10
 from collections import deque
 from nltk.corpus import stopwords
 
+from definitions import ROOT
 from tfidf.schemas import DocumentInDb
 
 analyzer = MorphAnalyzer()
@@ -24,6 +27,20 @@ def clean_string(string: str) -> str:
     string = re.sub(r'[^\w\s-]', '', string)
     string = string.lower()
     return string
+
+
+async def merge_files(collection_in: list[DocumentInDb]) -> str:
+    date = datetime.now(UTC).strftime('%Y-%m-%d_%H:%M:%S')
+    Path(f'{ROOT}/src/files/tmp/{date}').mkdir(parents=True, exist_ok=True)
+    path = f'{ROOT}/src/files/tmp/{date}/tmp.txt'
+
+    async with aiofiles.open(path, 'w') as tmp_file:
+        for document in collection_in:
+            async with aiofiles.open(document.path, 'r') as file:
+                async for line in file:
+                    await tmp_file.write(line)
+
+    return path
 
 
 def compute_tf_in_file(words: list[Word]):
