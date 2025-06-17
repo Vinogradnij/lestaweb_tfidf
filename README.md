@@ -23,16 +23,16 @@
 Ознакомиться с установкой можно по ссылке https://docs.docker.com/compose/install/
 2. Необходимо скачать из репозитория:
    * docker-compose.yaml, команда:  *curl -o docker-compose.yaml https://raw.githubusercontent.com/Vinogradnij/lestaweb_tfidf/refs/heads/master/docker-compose.yaml*
-   * .env-template, команда:  *curl -o .env-template https://raw.githubusercontent.com/Vinogradnij/lestaweb_tfidf/refs/heads/master/.env-template*
-3. В файле .env-template определить свои настройки для:
+   * .env-template, команда:  *curl -o .env https://raw.githubusercontent.com/Vinogradnij/lestaweb_tfidf/refs/heads/master/.env-template*
+3. В файле .env определить свои настройки для:
    * Базы данных - задать порт, имя и пароль пользователя, имя базы данных
    * Сервера - задать свой адрес хоста и порт
    * Безопасности - задать алгоритм (Например, HS256) и секретный ключ.
 Секретный ключ можно сгенерировать командой Linux: *openssl rand -base64 128*
-4. Убедитесь, что docker-compose.yaml и .env-template находятся в одной директории
+4. Убедитесь, что docker-compose.yaml и .env находятся в одной директории
 ## Запуск
 * Выполнить команду *docker compose up -d*
-* Сервис будет доступен по адресу, указанному в .env-template файле
+* Сервис будет доступен по адресу, на котором развернуто приложение и порту, указанному в .env
 ## Реализация
 ### Используемые инструменты
 * В качестве веб-фреймворка выбран FastAPI.
