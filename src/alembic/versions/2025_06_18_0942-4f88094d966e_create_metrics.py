@@ -49,7 +49,7 @@ def upgrade() -> None:
                 avg_time_huffman,
                 max_time_huffman,
                 all_time_huffman,
-                latest_huffman,
+                latest_huffman
             )
             VALUES (
                 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 0.0, 0.0, 0.0
