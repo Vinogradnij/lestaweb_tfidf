@@ -1,6 +1,6 @@
 services:
   backend:
-    image: vinogradnij/tfidf_app:1.5.1
+    image: vinogradnij/tfidf_app:1.5.2
     container_name: backend_tfidf
     ports:
       - "${TFIDF__RUN__PORT}:${TFIDF__RUN__PORT}"
