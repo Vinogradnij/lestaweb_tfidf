@@ -95,7 +95,7 @@ async def encode_text_by_huffman(session: AsyncSession, current_user: UserInDb, 
     result = await encode(path=document.path, encoding=encoding)
 
     end_time = time.perf_counter()
-    duration = end_time - start_time
+    duration = round(end_time - start_time, 3)
     await add_metrics(session=session, number_of_files=1, duration=duration, for_huffman=True)
 
     return result
@@ -322,7 +322,7 @@ async def compute_statistics(
     await session.commit()
 
     end_time = time.perf_counter()
-    duration = end_time - start_time
+    duration = round(end_time - start_time, 3)
     await add_metrics(session=session, number_of_files=len(statistics), duration=duration)
     return StatisticCollectionOut(collection=list(statistics_out))
 
