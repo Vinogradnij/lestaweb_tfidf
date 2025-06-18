@@ -1,9 +1,6 @@
-from huffman.tree import Node
-
-
 class PriorityQueue:
     def __init__(self):
-        self.queue: list[Node] = []
+        self.queue: list = []
 
     def push(self, value):
         self.queue.append(value)
