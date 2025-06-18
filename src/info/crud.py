@@ -46,7 +46,7 @@ async def add_metrics(
 async def get_metrics_crud(session: AsyncSession) -> MetricsOut:
     metrics = await session.get(Metrics, 1)
     return MetricsOut(
-        files_processed=metrics.files_processed,
+        collection_processed=metrics.files_processed,
         min_time_processed=metrics.min_time_processed,
         avg_time_processed=metrics.avg_time_processed,
         max_time_processed=metrics.max_time_processed,
