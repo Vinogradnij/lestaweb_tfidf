@@ -3,7 +3,7 @@ import time
 import aiofiles
 from fastapi import UploadFile, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_
+from sqlalchemy import select, and_, func
 from sqlalchemy.dialects.postgresql import insert
 from datetime import datetime, UTC
 from pathlib import Path
@@ -323,7 +323,8 @@ async def compute_statistics(
 
     end_time = time.perf_counter()
     duration = round(end_time - start_time, 3)
-    await add_metrics(session=session, number_of_files=len(statistics), duration=duration)
+    number_of_collection = await get_collections_count(session=session)
+    await add_metrics(session=session, number_of_files=number_of_collection, duration=duration)
     return StatisticCollectionOut(collection=list(statistics_out))
 
 
@@ -396,3 +397,9 @@ async def get_statistic_from_collection(
             statistics_out.extend(list_statistic_word_out)
 
     return list(statistics_out)
+
+
+async def get_collections_count(session: AsyncSession) -> int:
+    result = await session.execute(select(func.count()).select_from(Collection))
+    result = result.scalar_one()
+    return result
