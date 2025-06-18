@@ -15,6 +15,8 @@ from tfidf.schemas import DocumentOut, CollectionOut, DocumentOnlyIdOut, Documen
 from users.schemas import UserInDb
 from tfidf.models import Document, Collection, Collection_Document, Statistic
 from definitions import ROOT
+from huffman.service import get_frequency, encode
+from huffman.tree import HuffmanTree
 
 
 async def save_files(session: AsyncSession, current_user: UserInDb, files: list[UploadFile]):
@@ -77,6 +79,16 @@ async def get_files_text(session: AsyncSession, current_user: UserInDb, document
             result.append(chunks)
 
     return ''.join(result)
+
+
+async def encode_text_by_huffman(session: AsyncSession, current_user: UserInDb, document_id: int) -> str:
+    document = await get_file_by_id(session=session, current_user=current_user, document_id=document_id)
+    frequency = await get_frequency(path=document.path)
+    tree = HuffmanTree()
+    encoding = tree.get_encoding(frequency=frequency)
+    result = await encode(path=document.path, encoding=encoding)
+
+    return result
 
 
 async def delete_file(session: AsyncSession, current_user: UserInDb, document_id: int) -> None:

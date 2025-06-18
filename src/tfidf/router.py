@@ -7,7 +7,7 @@ from dependencies import session_dep
 from tfidf.schemas import DocumentOut, StatisticCollectionOut, StatisticWordOut, CollectionOut, DocumentOnlyIdOut
 from tfidf.crud import save_files, get_files, get_files_text, delete_file, get_collections_with_files, \
     get_collection_with_files, add_document_to_collection, pop_document_from_collection, compute_statistics, \
-    get_statistic_from_document, get_statistic_from_collection
+    get_statistic_from_document, get_statistic_from_collection, encode_text_by_huffman
 from users.crud import get_current_user
 from users.schemas import UserInDb
 
@@ -103,6 +103,18 @@ async def get_document_statistics(
     )
     return result
 
+
+@router.get(
+    '/documents/{document_id}/huffman',
+    summary='Получить содержимое документа, закодированное Кодом Хаффмана',
+)
+async def get_huffman(
+        session: session_dep,
+        current_user: Annotated[UserInDb, Depends(get_current_user)],
+        document_id: int,
+):
+    result = await encode_text_by_huffman(session=session, current_user=current_user, document_id=document_id)
+    return result
 
 @router.delete(
     '/documents/{document_id}',
