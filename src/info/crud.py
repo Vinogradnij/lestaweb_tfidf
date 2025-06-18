@@ -21,9 +21,9 @@ async def add_metrics(
         else:
             metrics.min_time_processed = metrics.min_time_processed \
                 if metrics.min_time_processed < duration else duration
-        metrics.all_time_processed += duration
+        metrics.all_time_processed = round(metrics.all_time_processed + duration, 3)
         metrics.avg_time_processed = metrics.avg_time_processed \
-            if metrics.files_processed == 0 else metrics.all_time_processed / metrics.files_processed
+            if metrics.files_processed == 0 else round(metrics.all_time_processed / metrics.files_processed, 3)
         metrics.max_time_processed = metrics.max_time_processed \
             if metrics.max_time_processed > duration else duration
         metrics.latest_file_processed_timestamp=(datetime.now(UTC) - timedelta(seconds=duration)).timestamp()
@@ -34,9 +34,9 @@ async def add_metrics(
         else:
             metrics.min_time_huffman = metrics.min_time_huffman \
                 if metrics.min_time_huffman < duration else duration
-        metrics.all_time_huffman += duration
+        metrics.all_time_huffman = round(metrics.all_time_huffman + duration, 3)
         metrics.avg_time_huffman = metrics.avg_time_huffman \
-            if metrics.files_huffman == 0 else metrics.all_time_huffman / metrics.files_huffman
+            if metrics.files_huffman == 0 else round(metrics.all_time_huffman / metrics.files_huffman, 3)
         metrics.max_time_huffman = metrics.max_time_huffman \
             if metrics.max_time_huffman > duration else duration
         metrics.latest_huffman=duration
