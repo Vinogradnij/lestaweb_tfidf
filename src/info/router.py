@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request
 
 from dependencies import session_dep
 from info.schemas import MetricsOut
-from info.crud import get_metrics_tfidf
+from info.crud import get_metrics_crud
 
 router = APIRouter(
     tags=['Служебная информация'],
@@ -16,7 +16,7 @@ router = APIRouter(
 async def get_metrics(
         session: session_dep,
 ):
-    metrics = await get_metrics_tfidf(session=session)
+    metrics = await get_metrics_crud(session=session)
     return metrics
 
 

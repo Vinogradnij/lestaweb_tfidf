@@ -35,3 +35,21 @@ async def add_metrics(
             if metrics.max_time_huffman > duration else duration
         metrics.latest_huffman=duration
     await session.commit()
+
+
+async def get_metrics_crud(session: AsyncSession) -> MetricsOut:
+    metrics = await session.get(Metrics, 1)
+    return MetricsOut(
+        files_processed=metrics.files_processed,
+        min_time_processed=metrics.min_time_processed,
+        avg_time_processed=metrics.avg_time_processed,
+        max_time_processed=metrics.max_time_processed,
+        all_time_processed=metrics.all_time_processed,
+        latest_file_processed_timestamp=metrics.latest_file_processed_timestamp,
+        files_huffman=metrics.files_huffman,
+        min_time_huffman=metrics.min_time_huffman,
+        avg_time_huffman=metrics.avg_time_huffman,
+        max_time_huffman=metrics.max_time_huffman,
+        all_time_huffman=metrics.all_time_huffman,
+        latest_huffman=metrics.latest_huffman,
+    )
