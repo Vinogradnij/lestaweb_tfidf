@@ -1,7 +1,9 @@
+import time
+
 import aiofiles
 from fastapi import UploadFile, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_
+from sqlalchemy import select, and_, func
 from sqlalchemy.dialects.postgresql import insert
 from datetime import datetime, UTC
 from pathlib import Path
@@ -17,6 +19,7 @@ from tfidf.models import Document, Collection, Collection_Document, Statistic
 from definitions import ROOT
 from huffman.service import get_frequency, encode
 from huffman.tree import HuffmanTree
+from info.crud import add_metrics
 
 
 async def save_files(session: AsyncSession, current_user: UserInDb, files: list[UploadFile]):
@@ -83,10 +86,17 @@ async def get_files_text(session: AsyncSession, current_user: UserInDb, document
 
 async def encode_text_by_huffman(session: AsyncSession, current_user: UserInDb, document_id: int) -> str:
     document = await get_file_by_id(session=session, current_user=current_user, document_id=document_id)
+
+    start_time = time.perf_counter()
+
     frequency = await get_frequency(path=document.path)
     tree = HuffmanTree()
     encoding = tree.get_encoding(frequency=frequency)
     result = await encode(path=document.path, encoding=encoding)
+
+    end_time = time.perf_counter()
+    duration = round(end_time - start_time, 3)
+    await add_metrics(session=session, number_of_files=1, duration=duration, for_huffman=True)
 
     return result
 
@@ -254,6 +264,7 @@ async def compute_statistics(
         current_user: UserInDb,
         collection_id: int
 ) -> StatisticCollectionOut:
+    start_time = time.perf_counter()
     stmt = (
         select(Collection)
         .where(and_(Collection.user_id == current_user.id, Collection.id == collection_id))
@@ -310,6 +321,10 @@ async def compute_statistics(
             statistics_out.append({document_id: list(list_statistic_word_out)})
     await session.commit()
 
+    end_time = time.perf_counter()
+    duration = round(end_time - start_time, 3)
+    number_of_collection = await get_collections_count(session=session)
+    await add_metrics(session=session, number_of_files=number_of_collection, duration=duration)
     return StatisticCollectionOut(collection=list(statistics_out))
 
 
@@ -382,3 +397,9 @@ async def get_statistic_from_collection(
             statistics_out.extend(list_statistic_word_out)
 
     return list(statistics_out)
+
+
+async def get_collections_count(session: AsyncSession) -> int:
+    result = await session.execute(select(func.count()).select_from(Collection))
+    result = result.scalar_one()
+    return result

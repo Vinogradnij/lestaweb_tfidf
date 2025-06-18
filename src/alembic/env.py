@@ -11,6 +11,7 @@ from database import Base
 from config import settings
 from users.models import User
 from tfidf.models import Document, Collection, Collection_Document, Statistic
+from info.models import Metrics
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
