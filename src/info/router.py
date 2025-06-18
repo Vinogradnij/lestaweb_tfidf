@@ -10,7 +10,7 @@ router = APIRouter(
 
 @router.get(
     '/metrics',
-    summary='Метрики приложения [Не реализовано]',
+    summary='Метрики приложения',
     response_model=MetricsOut
 )
 async def get_metrics(
